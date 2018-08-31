@@ -63,12 +63,12 @@ using MyMCVProject.Models;
             WriteLiteral("\r\n\r\n");
             EndContext();
             BeginContext(49, 98, false);
-            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("body", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "9344e575ac39490395fe756cbcd66cd8", async() => {
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("body", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "bfdabf639f4548dabbd813fdd14991b0", async() => {
                 BeginContext(55, 8, true);
                 WriteLiteral("\r\n\r\n    ");
                 EndContext();
                 BeginContext(63, 73, false);
-                __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "6efcaf4fd108489bb1067d72a0ff0617", async() => {
+                __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "056abeff2d5843678ae840f7461b702d", async() => {
                     BeginContext(121, 11, true);
                     WriteLiteral("View People");
                     EndContext();

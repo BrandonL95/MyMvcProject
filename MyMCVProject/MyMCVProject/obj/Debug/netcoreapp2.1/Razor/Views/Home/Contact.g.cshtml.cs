@@ -69,7 +69,7 @@ Write(ViewData["Title"]);
             WriteLiteral("</h1>\r\n");
             EndContext();
             BeginContext(72, 150, false);
-            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("body", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "2581f3b8c3074bf4a354b79ab54591e3", async() => {
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("body", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "d9489b4290c64377a10ce79405fa0d7c", async() => {
                 BeginContext(78, 137, true);
                 WriteLiteral("\r\n        <p>Contact Person: Brandon</p>\r\n        <p>Contact number: 054 869 8745</p>\r\n        <p>Contact E-Mail: brandon@gmail.com</p>\r\n");
                 EndContext();
