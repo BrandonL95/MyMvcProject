@@ -14,9 +14,9 @@ namespace MyMCVProject.Models.Person
         public string LName { get; set; }
         public string Email { get; set; }
 
-        public string getEmail()
+        public string getFName()
         {
-            return Email;
+            return FName;
         }
     }
 }

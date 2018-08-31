@@ -69,7 +69,7 @@ Write(ViewData["Title"]);
             WriteLiteral("</h2>\r\n\r\n");
             EndContext();
             BeginContext(72, 90, false);
-            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("body", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "10cf19d19b42451f91a079b958677646", async() => {
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("body", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "abd11fbd15734e9c927f8ff81ee3aac9", async() => {
                 BeginContext(78, 77, true);
                 WriteLiteral("\r\n\r\n    <p>At EC Docs we provide clouse based storages for your docs </p>\r\n\r\n");
                 EndContext();

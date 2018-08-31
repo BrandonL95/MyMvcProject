@@ -16,6 +16,12 @@ namespace MyMCVProject.Controllers
             return View();
         }
 
+        public IActionResult loggedin()
+        {
+            PersonModel person = new PersonModel();
+            return View(person.getFName());
+        }
+
         public IActionResult About()
         {
             ViewData["Message"] = "Your application description page.";
