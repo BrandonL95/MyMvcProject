@@ -23,12 +23,9 @@ namespace MyMCVProject.Controllers
             return View();
         }
 
-        public IActionResult Contact(string FName, string LName)
+        public IActionResult Contact()
         {
-            //Createing new person object
-            PersonModel person = new PersonModel(FName, LName);
-            //passing person to contact view
-            return View(person);
+            return View();
         }
 
         public IActionResult Privacy()

@@ -12355,6 +12355,7 @@
   "projectFileDependencyGroups": {
     ".NETCoreApp,Version=v2.1": [
       "Microsoft.AspNetCore.App >= 2.1.1",
+      "Microsoft.AspNetCore.Session >= 2.1.1",
       "Microsoft.NETCore.App >= 2.1.0",
       "Microsoft.VisualStudio.Web.CodeGeneration.Design >= 2.1.1",
       "MySql.Data >= 8.0.12"
@@ -12367,11 +12368,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\brand\\Desktop\\MyMVCProject\\MyMCVProject\\MyMCVProject\\MyMCVProject.csproj",
+      "projectUniqueName": "C:\\Users\\brand\\Documents\\GitHub\\MyMvcProject\\MyMCVProject\\MyMCVProject\\MyMCVProject.csproj",
       "projectName": "MyMCVProject",
-      "projectPath": "C:\\Users\\brand\\Desktop\\MyMVCProject\\MyMCVProject\\MyMCVProject\\MyMCVProject.csproj",
+      "projectPath": "C:\\Users\\brand\\Documents\\GitHub\\MyMvcProject\\MyMCVProject\\MyMCVProject\\MyMCVProject.csproj",
       "packagesPath": "C:\\Users\\brand\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\brand\\Desktop\\MyMVCProject\\MyMCVProject\\MyMCVProject\\obj\\",
+      "outputPath": "C:\\Users\\brand\\Documents\\GitHub\\MyMvcProject\\MyMCVProject\\MyMCVProject\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
@@ -12406,6 +12407,10 @@
             "target": "Package",
             "version": "[2.1.1, )",
             "autoReferenced": true
+          },
+          "Microsoft.AspNetCore.Session": {
+            "target": "Package",
+            "version": "[2.1.1, )"
           },
           "Microsoft.NETCore.App": {
             "target": "Package",

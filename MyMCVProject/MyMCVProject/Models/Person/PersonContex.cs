@@ -45,5 +45,30 @@ namespace MyMCVProject.Models.Person
 
             return people;
         }
+
+        public bool validateEmail(string email, string password)
+        {
+            bool valid = false;
+
+            using (MySqlConnection conn = GetConnection())
+            {
+                conn.Open();
+                MySqlCommand cmd = new MySqlCommand("SELECT email, password FROM people", conn);
+
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        if(email == reader["email"].ToString() && password == reader["password"].ToString())
+                        {
+                            valid = true;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            return valid;
+        }
     }
 }

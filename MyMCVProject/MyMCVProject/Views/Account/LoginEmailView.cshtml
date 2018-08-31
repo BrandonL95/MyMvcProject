@@ -1,49 +1,30 @@
 ﻿
 @{
-    ViewData["Title"] = "LoginEmailView";
+    ViewData["Title"] = "Login";
 }
 
-<h2>Login: Username</h2>
+<h2>Login</h2>
 <br>
 <body>
-    <div class="limiter">
-        <div class="container-login100">
-            <div class="wrap-login100">
-                <form class="login100-form validate-form">
-                    <span class="login100-form-title p-b-43">
-                        Login to continue
-                    </span>
 
-                    <br>
-
-                    <div class="wrap-input100 validate-input">
-                        <span class="label-input100">Email  </span>
-                        <input class="input100" type="text" name="email" size="50">
-                        <span class="focus-input100"></span>
-                    </div>
-
-                    <br>
-
-                    <div class="container-login100-form-btn">
-                        @using (Html.BeginForm("Account", "LoginPasswordView"))
-                        {
-                           <input type="submit" />
-                        }
-                    </div>
-
-                    <br>
-
-                    <div>
-                        <span class="txt2">
-                            Don't have an Account sign up for free
-                        </span>
-                        <br>
-                        <a asp-area="" asp-controller="Home" asp-action="Contact">Sign up</a>
-                    </div>
-
-                </form>
-            </div>
+    @if (!ViewData.ModelState.IsValid && ViewData.ModelState["Error"].Errors.Count > 0)
+    {
+        <div class="alert-danger">
+            <strong>Error! </strong> @ViewData.ModelState["Error"].Errors.First().ErrorMessage
         </div>
-    </div>
+        <br>
+    }
+
+    @using (Html.BeginForm("LoginEmailView", "Account"))
+    {
+        <label>E-mail</label>
+        <input type="text" name="Email" size="50" required>
+        <br>
+        <label>Password</label>
+        <input type="password" name="Password" required>
+        <br>
+        <button type="submit">Login</button>
+    }
+
 </body>
 
