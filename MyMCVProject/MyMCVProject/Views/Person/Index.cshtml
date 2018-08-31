@@ -1,0 +1,23 @@
+﻿@model IEnumerable<MyMCVProject.Models.Person.PersonModel>
+    @{
+        ViewBag.Title = "People";
+    }
+<!--Displaying people list-->
+    <h2>People</h2>
+    <table class="table">
+        <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+        </tr>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.LName)
+                </td>
+            </tr>
+        }
+    </table>
