@@ -1,0 +1,15 @@
+﻿
+@{
+    ViewData["Title"] = "Upload Private Docs";
+}
+
+<body>
+
+  <h1>Upload Private Docs</h1>
+  <br>
+  <form asp-controller="Docs" asp-action="UploadFilePrivate" method="post" enctype="multipart/form-data">
+      <input type="file" name="file" />
+      <button type="submit">Upload File</button>
+  </form>
+
+</body>

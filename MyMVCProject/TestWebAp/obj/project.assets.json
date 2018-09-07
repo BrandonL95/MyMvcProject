@@ -13347,11 +13347,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\brand\\Desktop\\MyMVCProject\\TestWebAp\\TestWebAp.csproj",
+      "projectUniqueName": "C:\\Users\\brand\\Documents\\GitHub\\MyMvcProject\\MyMVCProject\\TestWebAp\\TestWebAp.csproj",
       "projectName": "TestWebAp",
-      "projectPath": "C:\\Users\\brand\\Desktop\\MyMVCProject\\TestWebAp\\TestWebAp.csproj",
+      "projectPath": "C:\\Users\\brand\\Documents\\GitHub\\MyMvcProject\\MyMVCProject\\TestWebAp\\TestWebAp.csproj",
       "packagesPath": "C:\\Users\\brand\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\brand\\Desktop\\MyMVCProject\\TestWebAp\\obj\\",
+      "outputPath": "C:\\Users\\brand\\Documents\\GitHub\\MyMvcProject\\MyMVCProject\\TestWebAp\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"

@@ -46,3 +46,15 @@ C:\Users\brand\Desktop\New folder\MyMVCProjectbroken\TestWebAp\bin\Debug\netcore
 C:\Users\brand\Desktop\New folder\MyMVCProjectbroken\TestWebAp\bin\Debug\netcoreapp2.0\TestWebAp.runtimeconfig.dev.json
 C:\Users\brand\Desktop\New folder\MyMVCProjectbroken\TestWebAp\bin\Debug\netcoreapp2.0\TestWebAp.dll
 C:\Users\brand\Desktop\New folder\MyMVCProjectbroken\TestWebAp\bin\Debug\netcoreapp2.0\TestWebAp.pdb
+C:\Users\brand\Documents\GitHub\MyMvcProject\MyMVCProject\TestWebAp\bin\Debug\netcoreapp2.0\TestWebAp.deps.json
+C:\Users\brand\Documents\GitHub\MyMvcProject\MyMVCProject\TestWebAp\bin\Debug\netcoreapp2.0\TestWebAp.runtimeconfig.json
+C:\Users\brand\Documents\GitHub\MyMvcProject\MyMVCProject\TestWebAp\bin\Debug\netcoreapp2.0\TestWebAp.runtimeconfig.dev.json
+C:\Users\brand\Documents\GitHub\MyMvcProject\MyMVCProject\TestWebAp\bin\Debug\netcoreapp2.0\TestWebAp.dll
+C:\Users\brand\Documents\GitHub\MyMvcProject\MyMVCProject\TestWebAp\bin\Debug\netcoreapp2.0\TestWebAp.pdb
+C:\Users\brand\Documents\GitHub\MyMvcProject\MyMVCProject\TestWebAp\obj\Debug\netcoreapp2.0\TestWebAp.csprojAssemblyReference.cache
+C:\Users\brand\Documents\GitHub\MyMvcProject\MyMVCProject\TestWebAp\obj\Debug\netcoreapp2.0\TestWebAp.csproj.CoreCompileInputs.cache
+C:\Users\brand\Documents\GitHub\MyMvcProject\MyMVCProject\TestWebAp\obj\Debug\netcoreapp2.0\UserSecretsAssemblyInfo.cs
+C:\Users\brand\Documents\GitHub\MyMvcProject\MyMVCProject\TestWebAp\obj\Debug\netcoreapp2.0\TestWebAp.AssemblyInfoInputs.cache
+C:\Users\brand\Documents\GitHub\MyMvcProject\MyMVCProject\TestWebAp\obj\Debug\netcoreapp2.0\TestWebAp.AssemblyInfo.cs
+C:\Users\brand\Documents\GitHub\MyMvcProject\MyMVCProject\TestWebAp\obj\Debug\netcoreapp2.0\TestWebAp.dll
+C:\Users\brand\Documents\GitHub\MyMvcProject\MyMVCProject\TestWebAp\obj\Debug\netcoreapp2.0\TestWebAp.pdb

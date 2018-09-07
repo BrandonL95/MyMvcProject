@@ -29,10 +29,8 @@ namespace TestWebAp.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> UploadFile(IFormFile file)
+        public async Task<IActionResult> UploadFilePublic(IFormFile file)
         {
-            string userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString();
-
             dbContext = HttpContext.RequestServices.GetService(typeof(TestWebAp.Models.DocsViewModel.DocsContextClass)) as Models.DocsViewModel.DocsContextClass;
 
             if (file == null || file.Length == 0)
@@ -45,9 +43,31 @@ namespace TestWebAp.Controllers
                 await file.CopyToAsync(stream);
             }
 
-            dbContext.AddDocs(userId, file.FileName.ToString(), path.ToString());
+            if (dbContext.AddPrivateDocs(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString(), file.FileName.ToString(), path.ToString()))
+                return View("UploadFile");
+            else
+                return View("UploadFailed");
+        }
 
-            return View();
+        [HttpPost]
+        public async Task<IActionResult> UploadFilePrivate(IFormFile file)
+        {
+            dbContext = HttpContext.RequestServices.GetService(typeof(TestWebAp.Models.DocsViewModel.DocsContextClass)) as Models.DocsViewModel.DocsContextClass;
+
+            if (file == null || file.Length == 0)
+                return Content("file not selected");
+
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "FilesFolder", file.FileName);
+
+            using (var stream = new FileStream(path, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            if (dbContext.AddPublicDocs(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString(), file.FileName.ToString(), path.ToString()))
+                return View("UploadFile");
+            else
+                return View("UploadFailed");
         }
 
         public async Task<IActionResult> Download(string filename)
@@ -94,10 +114,29 @@ namespace TestWebAp.Controllers
         [Authorize]
         public IActionResult MyFilesView()
         {
-            //(default connection found in appsettings.json)
+            return View();
+        }
+
+        public IActionResult PublicDocsView()
+        {
             Models.DocsViewModel.DocsContextClass context = HttpContext.RequestServices.GetService(typeof(TestWebAp.Models.DocsViewModel.DocsContextClass)) as Models.DocsViewModel.DocsContextClass;
 
             return View(context.GetAllFiles());
+        }
+
+        public IActionResult PrivateDocsView()
+        {
+            return View();
+        }
+
+        public IActionResult UploadPublicView()
+        {
+            return View();
+        }
+
+        public IActionResult UploadPrivateView()
+        {
+            return View();
         }
     }
 }

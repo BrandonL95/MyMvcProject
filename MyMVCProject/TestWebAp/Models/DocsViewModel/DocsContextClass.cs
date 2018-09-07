@@ -20,22 +20,54 @@ namespace TestWebAp.Models.DocsViewModel
             return new MySqlConnection(ConnectionString);
         }
 
-        public void AddDocs(string UserID, string filename, string filePath)
+        public bool AddPublicDocs(string UserID, string filename, string filePath)
         {
+            bool success = false;
+
             try
             {
                 using (MySqlConnection conn = GetConnection())
                 {
                     conn.Open();
 
-                    MySqlCommand cmd = new MySqlCommand("INSERT INTO documents (UserID, FileName, FilePath) VALUES (" + "'" + UserID + "','" + filename + "','" + filePath + "');", conn);
-                    cmd.ExecuteNonQuery();
+                    MySqlCommand cmd = new MySqlCommand("INSERT INTO publicdocs (UserID, FileName, FilePath) VALUES (" + "'" + UserID + "','" + filename + "','" + filePath + "');", conn);
+
+                    if (cmd.ExecuteNonQuery() == 1)
+                        success = true;
+                    
                 }
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                return false;
             }
+
+           return success;
+        }
+
+        public bool AddPrivateDocs(string UserID, string filename, string filePath)
+        {
+            bool success = false;
+
+            try
+            {
+                using (MySqlConnection conn = GetConnection())
+                {
+                    conn.Open();
+
+                    MySqlCommand cmd = new MySqlCommand("INSERT INTO privatedocs (UserID, FileName, FilePath) VALUES (" + "'" + UserID + "','" + filename + "','" + filePath + "');", conn);
+
+                    if (cmd.ExecuteNonQuery() == 1)
+                        success = true;
+
+                }
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+
+            return success;
         }
 
         public List<DocsClass> GetAllFiles()
@@ -45,7 +77,7 @@ namespace TestWebAp.Models.DocsViewModel
             using (MySqlConnection conn = GetConnection())
             {
                 conn.Open();
-                MySqlCommand cmd = new MySqlCommand("SELECT FileName FROM documents", conn);
+                MySqlCommand cmd = new MySqlCommand("SELECT FileName FROM publicdocs", conn);
 
                 using (var reader = cmd.ExecuteReader())
                 {
