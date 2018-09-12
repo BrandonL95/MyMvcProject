@@ -1,22 +1,21 @@
 ﻿@model IEnumerable<TestWebAp.Models.DocsViewModel.DocsClass>
 @{
-    ViewData["Title"] = "Private Files";
+    ViewBag.Title = "Shared Files";
 }
-<h1>Private docs</h1>
+
 <body>
+
+    <h2>Files Shared with me</h2>
+
     <table class="table">
         <tr>
             <th>File Names</th>
-            <th>Add Colaberators</th>
         </tr>
         @foreach (var item in Model)
         {
             <tr>
                 <td>
                     <a asp-area="" asp-controller="Docs" asp-action="Download" asp-route-filename=@item.Myfilenames>@Html.DisplayFor(modelItem => item.Myfilenames)</a>
-                </td>
-                <td>
-                    <a asp-area="" asp-controller="Docs" asp-action="AddCollaberatorView" asp-route-filename=@item.Myfilenames>Colaberators</a>
                 </td>
             </tr>
         }

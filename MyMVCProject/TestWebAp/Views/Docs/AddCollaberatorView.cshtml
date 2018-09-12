@@ -1,0 +1,24 @@
+﻿@model IEnumerable<TestWebAp.Models.AccountViewModels.UserDBContext>
+@{
+    ViewBag.Title = "All Users";
+}
+
+<body>
+
+    <h2>Choose User to collaberate with @ViewBag.Filename </h2>
+
+    <table class="table">
+        <tr>
+            <th>File Names</th>
+        </tr>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    <a asp-area="" asp-controller="Docs" asp-action="writeColaberatorFile" asp-route-email=@item.email asp-route-filename=@ViewBag.Filename>@Html.DisplayFor(modelItem => item.email)</a>
+                </td>
+            </tr>
+        }
+    </table>
+
+</body>

@@ -10,6 +10,7 @@ using TestWebAp.Models.DocsViewModel;
 using TestWebAp.Models;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
+using System.Security.Cryptography;
 
 namespace TestWebAp.Controllers
 {
@@ -29,6 +30,36 @@ namespace TestWebAp.Controllers
         }
 
         [HttpPost]
+        public async Task<IActionResult> UploadFilePrivate(IFormFile file)
+        {
+            try
+            {
+                dbContext = HttpContext.RequestServices.GetService(typeof(TestWebAp.Models.DocsViewModel.DocsContextClass)) as Models.DocsViewModel.DocsContextClass;
+
+                if (file == null || file.Length == 0)
+                    return Content("file not selected");
+
+                string path = "C:\\Users\\brand\\Desktop\\Userfiles\\" + file.FileName;
+
+                if (dbContext.AddPrivateDocs(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString(), file.FileName.ToString(), path))
+                {
+                        using (var stream = new FileStream(path, FileMode.Create))
+                        {
+                            await file.CopyToAsync(stream);
+                        }
+
+                    return View("UploadFile");
+                }
+                else
+                    return View("UploadFailed");
+            }
+            catch (Exception)
+            {
+                return View("UploadFailed");
+            }
+        }
+
+        [HttpPost]
         public async Task<IActionResult> UploadFilePublic(IFormFile file)
         {
             dbContext = HttpContext.RequestServices.GetService(typeof(TestWebAp.Models.DocsViewModel.DocsContextClass)) as Models.DocsViewModel.DocsContextClass;
@@ -36,38 +67,22 @@ namespace TestWebAp.Controllers
             if (file == null || file.Length == 0)
                 return Content("file not selected");
 
-            var path = Path.Combine(Directory.GetCurrentDirectory(), "FilesFolder", file.FileName);
+            var path = "C:\\Users\\brand\\Desktop\\Userfiles\\" + file.FileName;
 
-            using (var stream = new FileStream(path, FileMode.Create))
+            string md5Hash;
+            using (var md5 = MD5.Create())
             {
-                await file.CopyToAsync(stream);
+                using (var stream = new FileStream(path, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                    md5Hash = BitConverter.ToString(md5.ComputeHash(stream)).Replace("-", string.Empty); ;
+                }
+
+                if (dbContext.AddPublicDocs(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString(), file.FileName.ToString(), path.ToString(), md5Hash))
+                    return View("UploadFile");
+                else
+                    return View("UploadFailed");
             }
-
-            if (dbContext.AddPrivateDocs(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString(), file.FileName.ToString(), path.ToString()))
-                return View("UploadFile");
-            else
-                return View("UploadFailed");
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> UploadFilePrivate(IFormFile file)
-        {
-            dbContext = HttpContext.RequestServices.GetService(typeof(TestWebAp.Models.DocsViewModel.DocsContextClass)) as Models.DocsViewModel.DocsContextClass;
-
-            if (file == null || file.Length == 0)
-                return Content("file not selected");
-
-            var path = Path.Combine(Directory.GetCurrentDirectory(), "FilesFolder", file.FileName);
-
-            using (var stream = new FileStream(path, FileMode.Create))
-            {
-                await file.CopyToAsync(stream);
-            }
-
-            if (dbContext.AddPublicDocs(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString(), file.FileName.ToString(), path.ToString()))
-                return View("UploadFile");
-            else
-                return View("UploadFailed");
         }
 
         public async Task<IActionResult> Download(string filename)
@@ -75,7 +90,7 @@ namespace TestWebAp.Controllers
             if (filename == null)
                 return Content("filename not present");
 
-            var path = Path.Combine(Directory.GetCurrentDirectory(), "FilesFolder", filename);
+            var path = "C:\\Users\\brand\\Desktop\\Userfiles\\" + filename;
 
             var memory = new MemoryStream();
             using (var stream = new FileStream(path, FileMode.Open))
@@ -103,10 +118,6 @@ namespace TestWebAp.Controllers
                 {".docx", "application/vnd.ms-word"},
                 {".xls", "application/vnd.ms-excel"},
                 {".xlsx", "application/vnd.openxmlformats officedocument.spreadsheetml.sheet"},
-                {".png", "image/png"},
-                {".jpg", "image/jpeg"},
-                {".jpeg", "image/jpeg"},
-                {".gif", "image/gif"},
                 {".csv", "text/csv"}
             };
         }
@@ -126,7 +137,9 @@ namespace TestWebAp.Controllers
 
         public IActionResult PrivateDocsView()
         {
-            return View();
+            Models.DocsViewModel.DocsContextClass context = HttpContext.RequestServices.GetService(typeof(TestWebAp.Models.DocsViewModel.DocsContextClass)) as Models.DocsViewModel.DocsContextClass;
+
+            return View(context.GetAllPrivateFiles(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString()));
         }
 
         public IActionResult UploadPublicView()
@@ -138,5 +151,31 @@ namespace TestWebAp.Controllers
         {
             return View();
         }
+
+        public IActionResult AddCollaberatorView(string filename)
+        {
+            Models.AccountViewModels.UserDBContext context = HttpContext.RequestServices.GetService(typeof(TestWebAp.Models.AccountViewModels.UserDBContext)) as Models.AccountViewModels.UserDBContext;
+
+            ViewBag.Filename = filename;
+
+            return View("AddCollaberatorView", context.GetAllUsers());
+        }
+
+        public IActionResult WriteColaberatorFile(string email, string filename)
+        {
+            Models.DocsViewModel.DocsContextClass context = HttpContext.RequestServices.GetService(typeof(TestWebAp.Models.DocsViewModel.DocsContextClass)) as Models.DocsViewModel.DocsContextClass;
+
+            context.writeColaberatorFile(email, filename);
+
+            return View("PrivateDocsView", context.GetAllPrivateFiles(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString()));
+        }
+
+        public IActionResult SharedView()
+        {
+            Models.DocsViewModel.DocsContextClass context = HttpContext.RequestServices.GetService(typeof(TestWebAp.Models.DocsViewModel.DocsContextClass)) as Models.DocsViewModel.DocsContextClass;
+
+            return View(context.GetSharedFiles(context.GetEmail(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString())));
+        }
+
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using TestWebAp;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,6 +14,7 @@ using TestWebAp.Models;
 using TestWebAp.Services;
 using Microsoft.Extensions.FileProviders;
 using System.IO;
+using TestWebAp.Controllers;
 
 namespace TestWebAp
 {
@@ -43,6 +45,8 @@ namespace TestWebAp
             services.Configure<AuthMessageSenderOptions>(Configuration);
 
             services.Add(new ServiceDescriptor(typeof(Models.DocsViewModel.DocsContextClass), new Models.DocsViewModel.DocsContextClass(Configuration.GetConnectionString("DefaultConnection"))));
+            services.Add(new ServiceDescriptor(typeof(Models.AccountViewModels.UserDBContext), new Models.AccountViewModels.UserDBContext(Configuration.GetConnectionString("DefaultConnection"))));
+
 
             services.AddMvc();
         }
