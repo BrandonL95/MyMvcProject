@@ -57,3 +57,4 @@ C:\Users\brand\Documents\GitHub\MyMvcProject\MyMVCProject\TestWebAp\obj\Debug\ne
 C:\Users\brand\Documents\GitHub\MyMvcProject\MyMVCProject\TestWebAp\obj\Debug\netcoreapp2.0\TestWebAp.pdb
 C:\Users\brand\Desktop\MyMVCProject\TestWebAp\obj\Debug\netcoreapp2.0\UserSecretsAssemblyInfo.cs
 C:\Users\brand\Desktop\MyMVCProject\TestWebAp\obj\Debug\netcoreapp2.0\TestWebAp.csprojAssemblyReference.cache
+C:\Users\brand\Documents\GitHub\MyMvcProject\MyMVCProject\TestWebAp\obj\Debug\netcoreapp2.0\UserSecretsAssemblyInfo.cs
