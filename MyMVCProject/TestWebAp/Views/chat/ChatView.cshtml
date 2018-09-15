@@ -1,0 +1,18 @@
+﻿
+@{
+    ViewData["Title"] = "Online Chat";
+}
+
+<body>
+    <br><br>
+            <input type="text" id="userInput" value=@ViewBag.Email hidden>
+  Message...<input type="text" id="messageInput" size="150" onfocus="document.getElementById('messageInput').value =''"/>
+            <input type="button" id="sendButton" value="Send Message" />
+  <br><br>
+
+  <ul id="messagesList"></ul>
+
+</body>
+
+<script src="~/lib/signalr/dist/browser/signalr.js"></script>
+<script src="~/js/chat.js"></script>

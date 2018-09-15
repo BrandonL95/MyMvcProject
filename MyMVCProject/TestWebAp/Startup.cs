@@ -15,6 +15,7 @@ using TestWebAp.Services;
 using Microsoft.Extensions.FileProviders;
 using System.IO;
 using TestWebAp.Controllers;
+using TestWebAp.Hubs;
 
 namespace TestWebAp
 {
@@ -47,8 +48,8 @@ namespace TestWebAp
             services.Add(new ServiceDescriptor(typeof(Models.DocsViewModel.DocsContextClass), new Models.DocsViewModel.DocsContextClass(Configuration.GetConnectionString("DefaultConnection"))));
             services.Add(new ServiceDescriptor(typeof(Models.AccountViewModels.UserDBContext), new Models.AccountViewModels.UserDBContext(Configuration.GetConnectionString("DefaultConnection"))));
 
-
             services.AddMvc();
+            services.AddSignalR();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -68,6 +69,11 @@ namespace TestWebAp
             app.UseStaticFiles();
 
             app.UseAuthentication();
+
+            app.UseSignalR(routes =>
+            {
+                routes.MapHub<ChatHub>("/chatHub");
+            });
 
             app.UseMvc(routes =>
             {

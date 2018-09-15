@@ -21,3 +21,15 @@ C:\Users\brand\Desktop\New folder\TestWebAp\TestWebAp\obj\Release\netcoreapp2.0\
 C:\Users\brand\Desktop\New folder\TestWebAp\TestWebAp\obj\Release\netcoreapp2.0\TestWebAp.AssemblyInfo.cs
 C:\Users\brand\Desktop\New folder\TestWebAp\TestWebAp\obj\Release\netcoreapp2.0\TestWebAp.dll
 C:\Users\brand\Desktop\New folder\TestWebAp\TestWebAp\obj\Release\netcoreapp2.0\TestWebAp.pdb
+C:\Users\brand\Desktop\MyMVCProject\TestWebAp\bin\Release\netcoreapp2.0\TestWebAp.deps.json
+C:\Users\brand\Desktop\MyMVCProject\TestWebAp\bin\Release\netcoreapp2.0\TestWebAp.runtimeconfig.json
+C:\Users\brand\Desktop\MyMVCProject\TestWebAp\bin\Release\netcoreapp2.0\TestWebAp.runtimeconfig.dev.json
+C:\Users\brand\Desktop\MyMVCProject\TestWebAp\bin\Release\netcoreapp2.0\TestWebAp.dll
+C:\Users\brand\Desktop\MyMVCProject\TestWebAp\bin\Release\netcoreapp2.0\TestWebAp.pdb
+C:\Users\brand\Desktop\MyMVCProject\TestWebAp\obj\Release\netcoreapp2.0\TestWebAp.csprojAssemblyReference.cache
+C:\Users\brand\Desktop\MyMVCProject\TestWebAp\obj\Release\netcoreapp2.0\TestWebAp.csproj.CoreCompileInputs.cache
+C:\Users\brand\Desktop\MyMVCProject\TestWebAp\obj\Release\netcoreapp2.0\UserSecretsAssemblyInfo.cs
+C:\Users\brand\Desktop\MyMVCProject\TestWebAp\obj\Release\netcoreapp2.0\TestWebAp.AssemblyInfoInputs.cache
+C:\Users\brand\Desktop\MyMVCProject\TestWebAp\obj\Release\netcoreapp2.0\TestWebAp.AssemblyInfo.cs
+C:\Users\brand\Desktop\MyMVCProject\TestWebAp\obj\Release\netcoreapp2.0\TestWebAp.dll
+C:\Users\brand\Desktop\MyMVCProject\TestWebAp\obj\Release\netcoreapp2.0\TestWebAp.pdb
