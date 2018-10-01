@@ -4,21 +4,19 @@
 }
 
 <body>
-
-  <h2>Public Files</h2>
-
-  <table class="table">
-    <tr>
-        <th>File Names</th>
-    </tr>
-    @foreach (var item in Model)
-    {
-        <tr>
-            <td>
-                <a asp-area="" asp-controller="Docs" asp-action="Download" asp-route-filename=@item.Myfilenames>@Html.DisplayFor(modelItem => item.Myfilenames)</a>
-            </td>
-        </tr>
-    }
-  </table>
-
+    <h2>Public Files</h2>
+    <br>
+    <div class="container">
+        <div class="row">
+            @foreach (var item in Model)
+            {
+                <div class="col-md-4">
+                    <div class="card mb-4">
+                            <h5 class="card-title">@item.Myfilenames</h5>
+                            <a asp-area="" asp-controller="Docs" asp-action="Download" asp-route-filename=@item.Myfilenames>Download</a>
+                        </div>
+                    </div>
+            }
+        </div>
+    </div>
 </body>
