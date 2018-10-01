@@ -32,31 +32,27 @@ namespace TestWebAp.Controllers
         [HttpPost]
         public async Task<IActionResult> UploadFilePrivate(IFormFile file)
         {
-            try
-            {
                 dbContext = HttpContext.RequestServices.GetService(typeof(TestWebAp.Models.DocsViewModel.DocsContextClass)) as Models.DocsViewModel.DocsContextClass;
 
                 if (file == null || file.Length == 0)
                     return Content("file not selected");
 
-                string path = "C:\\Users\\brand\\Desktop\\Userfiles\\" + file.FileName;
+                string path = "C:\\Users\\brand\\Desktop\\Userfiles\\" + dbContext.GetEmail(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString()) + "\\" + file.FileName;
 
-                if (dbContext.AddPrivateDocs(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString(), file.FileName.ToString(), path))
+                string md5Hash;
+                using (var md5 = MD5.Create())
                 {
-                        using (var stream = new FileStream(path, FileMode.Create))
-                        {
-                            await file.CopyToAsync(stream);
-                        }
+                    using (var stream = new FileStream(path, FileMode.Create))
+                    {
+                        await file.CopyToAsync(stream);
+                        md5Hash = BitConverter.ToString(md5.ComputeHash(stream)).Replace("-", string.Empty); ;
+                    }
 
-                    return View("UploadFile");
+                    if (dbContext.AddPrivateDocs(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString(), file.FileName.ToString(), path.ToString(), md5Hash, DateTime.Now, (double)file.Length))
+                        return View("UploadFile");
+                    else
+                        return View("UploadFailed");
                 }
-                else
-                    return View("UploadFailed");
-            }
-            catch (Exception)
-            {
-                return View("UploadFailed");
-            }
         }
 
         [HttpPost]
@@ -67,7 +63,7 @@ namespace TestWebAp.Controllers
             if (file == null || file.Length == 0)
                 return Content("file not selected");
 
-            var path = "C:\\Users\\brand\\Desktop\\Userfiles\\" + file.FileName;
+            string path = "C:\\Users\\brand\\Desktop\\Userfiles\\" + dbContext.GetEmail(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString()) + "\\" + file.FileName;
 
             string md5Hash;
             using (var md5 = MD5.Create())
@@ -78,7 +74,7 @@ namespace TestWebAp.Controllers
                     md5Hash = BitConverter.ToString(md5.ComputeHash(stream)).Replace("-", string.Empty); ;
                 }
 
-                if (dbContext.AddPublicDocs(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString(), file.FileName.ToString(), path.ToString(), md5Hash))
+                if (dbContext.AddPublicDocs(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString(), file.FileName.ToString(), path.ToString(), md5Hash, DateTime.Now , (double)file.Length))
                     return View("UploadFile");
                 else
                     return View("UploadFailed");
@@ -87,18 +83,48 @@ namespace TestWebAp.Controllers
 
         public async Task<IActionResult> Download(string filename)
         {
+            dbContext = HttpContext.RequestServices.GetService(typeof(TestWebAp.Models.DocsViewModel.DocsContextClass)) as Models.DocsViewModel.DocsContextClass;
+
             if (filename == null)
                 return Content("filename not present");
 
-            var path = "C:\\Users\\brand\\Desktop\\Userfiles\\" + filename;
+            var path = "C:\\Users\\brand\\Desktop\\Userfiles\\" + dbContext.GetEmail(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString()) + "\\" + filename;
 
-            var memory = new MemoryStream();
-            using (var stream = new FileStream(path, FileMode.Open))
+            if (path != null)
             {
-                await stream.CopyToAsync(memory);
+                var memory = new MemoryStream();
+                using (var stream = new FileStream(path, FileMode.Open))
+                {
+                    await stream.CopyToAsync(memory);
+                }
+                memory.Position = 0;
+                return File(memory, GetContentType(path), Path.GetFileName(path));
             }
-            memory.Position = 0;
-            return File(memory, GetContentType(path), Path.GetFileName(path));
+
+            return View("SharedView");
+        }
+
+        public async Task<IActionResult> Downloadshared(string filename)
+        {
+            dbContext = HttpContext.RequestServices.GetService(typeof(TestWebAp.Models.DocsViewModel.DocsContextClass)) as Models.DocsViewModel.DocsContextClass;
+
+            if (filename == null)
+                return Content("filename not present");
+
+            var path = dbContext.getPath(dbContext.GetEmail(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString()), filename);
+
+            if (path != null)
+            {
+                var memory = new MemoryStream();
+                using (var stream = new FileStream(path, FileMode.Open))
+                {
+                    await stream.CopyToAsync(memory);
+                }
+                memory.Position = 0;
+                return File(memory, GetContentType(path), Path.GetFileName(path));
+            }
+
+            return View("SharedView");
         }
 
         private string GetContentType(string path)
@@ -165,7 +191,7 @@ namespace TestWebAp.Controllers
         {
             Models.DocsViewModel.DocsContextClass context = HttpContext.RequestServices.GetService(typeof(TestWebAp.Models.DocsViewModel.DocsContextClass)) as Models.DocsViewModel.DocsContextClass;
 
-            context.writeColaberatorFile(email, filename);
+            context.writeColaberatorFile(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString(), email, filename);
 
             return View("PrivateDocsView", context.GetAllPrivateFiles(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString()));
         }

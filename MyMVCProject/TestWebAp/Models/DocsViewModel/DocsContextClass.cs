@@ -23,7 +23,7 @@ namespace TestWebAp.Models.DocsViewModel
             return new MySqlConnection(ConnectionString);
         }
 
-        public bool AddPublicDocs(string UserID, string filename, string filePath, string md5)
+        public bool AddPublicDocs(string UserID, string filename, string filePath, string md5, DateTime dateUploaded, double size)
         {
             bool success = false;
 
@@ -33,7 +33,9 @@ namespace TestWebAp.Models.DocsViewModel
                 {
                     conn.Open();
 
-                    MySqlCommand cmd = new MySqlCommand("INSERT INTO publicdocs (OwnerID, FileName, FilePath, md5Checksum) VALUES (" + "'" + UserID + "','" + filename + "','" + filePath + "','" + md5 + "');", conn);
+                    string sizeMB = (size / 1024).ToString("0.0") + " KB";
+
+                    MySqlCommand cmd = new MySqlCommand("INSERT INTO publicdocs (OwnerID, FileName, FilePath, md5Checksum, DateUploaded, fileSize) VALUES (" + "'" + UserID + "','" + filename + "','" + filePath + "','" + md5 + "','" + dateUploaded + "','" + sizeMB + "');", conn);
 
                     if (cmd.ExecuteNonQuery() == 1)
                         success = true;
@@ -47,7 +49,7 @@ namespace TestWebAp.Models.DocsViewModel
             return success;
         }
 
-        public bool AddPrivateDocs(string UserID, string filename, string filePath)
+        public bool AddPrivateDocs(string UserID, string filename, string filePath, string md5, DateTime dateUploaded, double size)
         {
             bool success = false;
 
@@ -57,15 +59,16 @@ namespace TestWebAp.Models.DocsViewModel
                 {
                     conn.Open();
 
-                    MySqlCommand cmd = new MySqlCommand("INSERT INTO privatedocs (OwnerID, FileName, FilePath) VALUES (" + "'" + UserID + "','" + filename + "','" + filePath + "');", conn);
+                    string sizeMB = (size / 1024).ToString("0.0") + " KB";
+
+                    MySqlCommand cmd = new MySqlCommand("INSERT INTO privatedocs (OwnerID, FileName, FilePath, md5Checksum, DateUploaded, fileSize) VALUES (" + "'" + UserID + "','" + filename + "','" + filePath + "','" + md5 + "','" + dateUploaded + "','" + sizeMB + "');", conn);
 
                     if (cmd.ExecuteNonQuery() == 1)
                         success = true;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                string m = ex.Message;
                 return false;
             }
 
@@ -130,7 +133,7 @@ namespace TestWebAp.Models.DocsViewModel
 
                 DocsClass myFile = new DocsClass();
 
-                MySqlCommand cmd = new MySqlCommand("SELECT Email FROM aspnetusers WHERE Id ='" + userID + "';", conn);
+                MySqlCommand cmd = new MySqlCommand("SELECT Email FROM users WHERE Id ='" + userID + "';", conn);
 
                 using (var reader = cmd.ExecuteReader())
                 {
@@ -200,16 +203,44 @@ namespace TestWebAp.Models.DocsViewModel
             }
         }
 
-        public string WriteLog(string userID, string filename)
+        public string getPath(string email, string FileName)
         {
-            return "File = " + filename + " /n whas changed by " + userID;
+            using (MySqlConnection conn = GetConnection())
+            {
+                List<string> collaberators = new List<string>();
+                string MyPath = "";
+
+                conn.Open();
+                MySqlCommand cmd = new MySqlCommand("SELECT OwnerID, FileName FROM privatedocs", conn);
+
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        string filename = reader["FileName"].ToString();
+                        string ownerID = reader["OwnerID"].ToString();
+
+                        collaberators = readColaberatorFile(ownerID, filename);
+                        int c = collaberators.Count;
+                        for (int k = 0; k < collaberators.Count; k++)
+                        {
+                            if (collaberators[k].ToString() == email && FileName == filename)
+                            {
+                                MyPath = "C:\\Users\\brand\\Desktop\\Userfiles\\" + GetEmail(ownerID) + "\\" + FileName;
+                                break;
+                            }
+                        }
+                    }
+                }
+                return MyPath;
+            }
         }
 
-        public void writeColaberatorFile(string userID, string filename)
+        public void writeColaberatorFile(string ownerID, string userID, string filename)
         {
             try
             {
-                StreamWriter sw = new StreamWriter("C:\\Users\\brand\\Desktop\\Userfiles\\" + filename.Remove(filename.LastIndexOf("."),1) + "Collaberators.txt", true);
+                StreamWriter sw = new StreamWriter("C:\\Users\\brand\\Desktop\\Userfiles\\" + GetEmail(ownerID) + "\\" + filename.Remove(filename.LastIndexOf("."),1) + "Collaberators.txt", true);
 
                 sw.WriteLine(userID);
 
@@ -221,13 +252,13 @@ namespace TestWebAp.Models.DocsViewModel
             }
         }
 
-        public List<string> readColaberatorFile(string filename)
+        public List<string> readColaberatorFile(string owner, string filename)
         {
             List<string> colaberators = new List<string>();
 
             try
             {
-                using (StreamReader reader = new StreamReader("C:\\Users\\brand\\Desktop\\Userfiles\\" + filename.Remove(filename.LastIndexOf("."), 1) + "Collaberators.txt"))
+                using (StreamReader reader = new StreamReader("C:\\Users\\brand\\Desktop\\Userfiles\\" + GetEmail(owner) + "\\" + filename.Remove(filename.LastIndexOf("."), 1) + "Collaberators.txt"))
                 {
                     string Line = reader.ReadLine();
                     while (Line != null)
@@ -255,15 +286,16 @@ namespace TestWebAp.Models.DocsViewModel
                 List<string> collaberators = new List<string>();
 
                 conn.Open();
-                MySqlCommand cmd = new MySqlCommand("SELECT FileName FROM privatedocs", conn);
+                MySqlCommand cmd = new MySqlCommand("SELECT OwnerID, FileName FROM privatedocs", conn);
 
                 using (var reader = cmd.ExecuteReader())
                 {
                     while (reader.Read())
                     {
                         string filename = reader["FileName"].ToString();
+                        string ownerID = reader["OwnerID"].ToString();
 
-                        collaberators = readColaberatorFile(filename);
+                        collaberators = readColaberatorFile(ownerID, filename);
                         int c = collaberators.Count;
                         for (int k = 0; k < collaberators.Count; k++)
                         {

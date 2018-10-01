@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -63,15 +64,11 @@ namespace TestWebAp.Controllers
             {
                 // This doesn't count login failures towards account lockout
                 // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-                var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
+                var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: true);
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User logged in.");
                     return RedirectToLocal(returnUrl);
-                }
-                if (result.RequiresTwoFactor)
-                {
-                    return RedirectToAction(nameof(LoginWith2fa), new { returnUrl, model.RememberMe });
                 }
                 if (result.IsLockedOut)
                 {
@@ -107,7 +104,7 @@ namespace TestWebAp.Controllers
             return View(model);
         }
 
-        [HttpPost]
+       /* [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> LoginWith2fa(LoginWith2faViewModel model, bool rememberMe, string returnUrl = null)
@@ -143,7 +140,7 @@ namespace TestWebAp.Controllers
                 ModelState.AddModelError(string.Empty, "Invalid authenticator code.");
                 return View();
             }
-        }
+        }*/
 
         [HttpGet]
         [AllowAnonymous]
@@ -226,6 +223,11 @@ namespace TestWebAp.Controllers
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
+                    if (!(Directory.Exists("C:\\Users\\brand\\Desktop\\Userfiles\\" + user.Email)))
+                    {
+                        Directory.CreateDirectory("C:\\Users\\brand\\Desktop\\Userfiles\\" + user.Email);
+                    }
+
                     _logger.LogInformation("User created a new account with password.");
 
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);

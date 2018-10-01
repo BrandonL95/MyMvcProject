@@ -30,7 +30,7 @@ namespace TestWebAp.Models.AccountViewModels
             using (MySqlConnection conn = GetConnection())
             {
                 conn.Open();
-                MySqlCommand cmd = new MySqlCommand("SELECT EMAIL FROM aspnetusers", conn);
+                MySqlCommand cmd = new MySqlCommand("SELECT EMAIL FROM users", conn);
 
                 using (var reader = cmd.ExecuteReader())
                 {
