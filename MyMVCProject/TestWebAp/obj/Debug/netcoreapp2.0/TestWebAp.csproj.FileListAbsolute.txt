@@ -57,4 +57,3 @@ C:\Users\brand\Desktop\MyMVCProject\TestWebAp\obj\Debug\netcoreapp2.0\TestWebAp.
 C:\Users\brand\Desktop\MyMVCProject\TestWebAp\obj\Debug\netcoreapp2.0\TestWebAp.AssemblyInfo.cs
 C:\Users\brand\Desktop\MyMVCProject\TestWebAp\obj\Debug\netcoreapp2.0\TestWebAp.dll
 C:\Users\brand\Desktop\MyMVCProject\TestWebAp\obj\Debug\netcoreapp2.0\TestWebAp.pdb
-C:\Users\brand\Desktop\MyMVCProject\TestWebAp\obj\Debug\netcoreapp2.0\TestWebAp.csprojAssemblyReference.cache

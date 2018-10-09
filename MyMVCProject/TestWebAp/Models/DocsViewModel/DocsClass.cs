@@ -10,5 +10,9 @@ namespace TestWebAp.Models.DocsViewModel
         public string Myfilenames { get; set; }
 
         public string docPath { get; set; }
+
+        public string Email { get; set; }
+
+        public string OwnerID { get; set; }
     }
 }

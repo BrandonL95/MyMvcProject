@@ -1,0 +1,15 @@
+﻿@model TestWebAp.Models.DocsViewModel.DocsClass
+@{
+    ViewData["Title"] = "Update Private File";
+}
+
+<body>
+
+    <h1>Update Public Docs</h1>
+    <br>
+    <form asp-controller="Docs" asp-action="UpdateFilePrivate" asp-route-OwnerID=@Model.OwnerID asp-route-OldFileName=@Model.Myfilenames method="post" enctype="multipart/form-data">
+        <input type="file" name="file" />
+        <button type="submit">Upload File</button>
+    </form>
+
+</body>

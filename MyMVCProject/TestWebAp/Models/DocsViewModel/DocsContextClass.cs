@@ -82,7 +82,7 @@ namespace TestWebAp.Models.DocsViewModel
             using (MySqlConnection conn = GetConnection())
             {
                 conn.Open();
-                MySqlCommand cmd = new MySqlCommand("SELECT FileName FROM publicdocs", conn);
+                MySqlCommand cmd = new MySqlCommand("SELECT OwnerID, FileName, FilePath FROM publicdocs", conn);
 
                 using (var reader = cmd.ExecuteReader())
                 {
@@ -91,6 +91,9 @@ namespace TestWebAp.Models.DocsViewModel
                         Myfiles.Add(new DocsClass()
                         {
                             Myfilenames = reader["FileName"].ToString(),
+                            Email = GetEmail(reader["OwnerID"].ToString()),
+                            OwnerID = reader["OwnerID"].ToString(),
+                            docPath = reader["FilePath"].ToString()
                         });
                     }
                 }
@@ -106,7 +109,7 @@ namespace TestWebAp.Models.DocsViewModel
             using (MySqlConnection conn = GetConnection())
             {
                 conn.Open();
-                MySqlCommand cmd = new MySqlCommand("SELECT FileName FROM privatedocs Where OwnerID = '" + userID + "';", conn);
+                MySqlCommand cmd = new MySqlCommand("SELECT OwnerID, FileName, FilePath FROM privatedocs Where OwnerID = '" + userID + "';", conn);
 
                 using (var reader = cmd.ExecuteReader())
                 {
@@ -115,6 +118,9 @@ namespace TestWebAp.Models.DocsViewModel
                         Myfiles.Add(new DocsClass()
                         {
                             Myfilenames = reader["FileName"].ToString(),
+                            OwnerID = reader["OwnerID"].ToString(),
+                            docPath = reader["FilePath"].ToString()
+
                         });
                     }
                 }
@@ -135,7 +141,7 @@ namespace TestWebAp.Models.DocsViewModel
 
                 MySqlCommand cmd = new MySqlCommand("SELECT Email FROM users WHERE Id ='" + userID + "';", conn);
 
-                using (var reader = cmd.ExecuteReader())
+                using (MySqlDataReader reader = cmd.ExecuteReader())
                 {
                     while (reader.Read())
                     {
@@ -159,7 +165,7 @@ namespace TestWebAp.Models.DocsViewModel
 
                 MySqlCommand cmd = new MySqlCommand("SELECT OwnerID, FileName FROM publicdocs", conn);
 
-                using (var reader = cmd.ExecuteReader())
+                using (MySqlDataReader reader = cmd.ExecuteReader())
                 {
                     while (reader.Read())
                     {
@@ -191,7 +197,7 @@ namespace TestWebAp.Models.DocsViewModel
 
                 MySqlCommand cmd = new MySqlCommand("SELECT md5Checksum FROM publicdocs WHERE OwnerID ='" + userID + "', FileName = '" + filename + "';", conn);
 
-                using (var reader = cmd.ExecuteReader())
+                using (MySqlDataReader reader = cmd.ExecuteReader())
                 {
                     while (reader.Read())
                     {
@@ -213,7 +219,7 @@ namespace TestWebAp.Models.DocsViewModel
                 conn.Open();
                 MySqlCommand cmd = new MySqlCommand("SELECT OwnerID, FileName FROM privatedocs", conn);
 
-                using (var reader = cmd.ExecuteReader())
+                using (MySqlDataReader reader = cmd.ExecuteReader())
                 {
                     while (reader.Read())
                     {
@@ -288,7 +294,7 @@ namespace TestWebAp.Models.DocsViewModel
                 conn.Open();
                 MySqlCommand cmd = new MySqlCommand("SELECT OwnerID, FileName FROM privatedocs", conn);
 
-                using (var reader = cmd.ExecuteReader())
+                using (MySqlDataReader reader = cmd.ExecuteReader())
                 {
                     while (reader.Read())
                     {
@@ -304,6 +310,7 @@ namespace TestWebAp.Models.DocsViewModel
                                 Myfiles.Add(new DocsClass()
                                 {
                                     Myfilenames = reader["FileName"].ToString(),
+                                    Email = GetEmail(reader["OwnerID"].ToString())
                                 });
                             }
                         }
@@ -313,6 +320,72 @@ namespace TestWebAp.Models.DocsViewModel
                 return Myfiles;
             }
 
+        }
+
+        public bool DeletePrivateFile(string OwnerID, string filename)
+        {
+            bool deleted = false;
+
+            using(MySqlConnection Conn = GetConnection())
+            {
+                MySqlCommand cmd = new MySqlCommand("DELETE FROM privatedocs WHERE OwnerID = '" + OwnerID + "' AND FileName = '" + filename + "';", Conn);
+                Conn.Open();
+                if (cmd.ExecuteNonQuery() == 1)
+                    deleted = true;
+            }
+
+            return deleted;
+        }
+
+        public bool DeletePublicFile(string OwnerID, string filename)
+        {
+            bool deleted = false;
+
+            using (MySqlConnection Conn = GetConnection())
+            {
+                MySqlCommand cmd = new MySqlCommand("DELETE FROM publicdocs WHERE OwnerID = '" + OwnerID + "' AND FileName = '" + filename + "';", Conn);
+                Conn.Open();
+                if (cmd.ExecuteNonQuery() == 1)
+                    deleted = true;
+            }
+
+            return deleted;
+        }
+
+        public bool updatePublicFile(string OwnerID, string oldfilename, string NewFileName, double fileSize)
+        {
+            bool updated = false;
+
+            string sizeMB = (fileSize / 1024).ToString("0.0") + " KB";
+            string OF = OwnerID + "  " + oldfilename;
+            using (MySqlConnection Conn = GetConnection())
+            {
+                MySqlCommand cmd = new MySqlCommand("UPDATE publicdocs SET FileName = '" + NewFileName + "', DateUploaded = '" + DateTime.Now + "', FileSize = '" + sizeMB + "' WHERE OwnerID = '" + OwnerID + "' AND FileName = '" + oldfilename + "';", Conn);
+                Conn.Open();
+
+                if (cmd.ExecuteNonQuery() == 1)
+                    updated = true;
+            }
+
+            return updated;
+        }
+
+        public bool updatePrivateFile(string OwnerID, string oldfilename, string NewFileName, double fileSize)
+        {
+            bool updated = false;
+
+            string sizeMB = (fileSize / 1024).ToString("0.0") + " KB";
+            string OF = OwnerID + "  " + oldfilename;
+            using (MySqlConnection Conn = GetConnection())
+            {
+                MySqlCommand cmd = new MySqlCommand("UPDATE privatedocs SET FileName = '" + NewFileName + "', DateUploaded = '" + DateTime.Now + "', FileSize = '" + sizeMB + "' WHERE OwnerID = '" + OwnerID + "' AND FileName = '" + oldfilename + "';", Conn);
+                Conn.Open();
+
+                if (cmd.ExecuteNonQuery() == 1)
+                    updated = true;
+            }
+
+            return updated;
         }
     }
 }

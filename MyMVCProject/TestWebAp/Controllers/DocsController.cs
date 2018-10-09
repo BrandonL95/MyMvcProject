@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using System.IO;
 using TestWebAp.Models.DocsViewModel;
-using TestWebAp.Models;
-using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 using System.Security.Cryptography;
 
@@ -30,29 +27,29 @@ namespace TestWebAp.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> UploadFilePrivate(IFormFile file)
+        public async Task<IActionResult> UploadFilePrivate(IFormFile file, string OwnerID)
         {
-                dbContext = HttpContext.RequestServices.GetService(typeof(TestWebAp.Models.DocsViewModel.DocsContextClass)) as Models.DocsViewModel.DocsContextClass;
+            dbContext = HttpContext.RequestServices.GetService(typeof(TestWebAp.Models.DocsViewModel.DocsContextClass)) as Models.DocsViewModel.DocsContextClass;
 
-                if (file == null || file.Length == 0)
-                    return Content("file not selected");
+            if (file == null || file.Length == 0)
+                return View("UploadFailed");
 
-                string path = "C:\\Users\\brand\\Desktop\\Userfiles\\" + dbContext.GetEmail(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString()) + "\\" + file.FileName;
+            string path = @"C:\\Users\\brand\\Desktop\\Userfiles\\" + dbContext.GetEmail(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString()) + @"\\" + file.FileName;
 
-                string md5Hash;
-                using (var md5 = MD5.Create())
+            string md5Hash;
+            using (var md5 = MD5.Create())
+            {
+                using (FileStream stream = new FileStream(path, FileMode.Create))
                 {
-                    using (var stream = new FileStream(path, FileMode.Create))
-                    {
-                        await file.CopyToAsync(stream);
-                        md5Hash = BitConverter.ToString(md5.ComputeHash(stream)).Replace("-", string.Empty); ;
-                    }
-
-                    if (dbContext.AddPrivateDocs(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString(), file.FileName.ToString(), path.ToString(), md5Hash, DateTime.Now, (double)file.Length))
-                        return View("UploadFile");
-                    else
-                        return View("UploadFailed");
+                    await file.CopyToAsync(stream);
+                    md5Hash = BitConverter.ToString(md5.ComputeHash(stream)).Replace("-", string.Empty); ;
                 }
+            }
+
+                if (dbContext.AddPrivateDocs(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString(), file.FileName.ToString(), path.ToString(), md5Hash, DateTime.Now, (double)file.Length))
+                    return View("UploadFile");
+                else
+                    return View("UploadFailed");
         }
 
         [HttpPost]
@@ -61,39 +58,82 @@ namespace TestWebAp.Controllers
             dbContext = HttpContext.RequestServices.GetService(typeof(TestWebAp.Models.DocsViewModel.DocsContextClass)) as Models.DocsViewModel.DocsContextClass;
 
             if (file == null || file.Length == 0)
-                return Content("file not selected");
+                return View("UploadFailed");
 
-            string path = "C:\\Users\\brand\\Desktop\\Userfiles\\" + dbContext.GetEmail(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString()) + "\\" + file.FileName;
+            string path = @"C:\\Users\\brand\\Desktop\\Userfiles\\" + dbContext.GetEmail(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString()) + @"\\" + file.FileName;
 
-            string md5Hash;
-            using (var md5 = MD5.Create())
+            if (dbContext.AddPublicDocs(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString(), file.FileName.ToString(), path.ToString(), "fg", DateTime.Now, (double)file.Length))
             {
-                using (var stream = new FileStream(path, FileMode.Create))
+                using (FileStream stream = new FileStream(path, FileMode.Create))
                 {
                     await file.CopyToAsync(stream);
-                    md5Hash = BitConverter.ToString(md5.ComputeHash(stream)).Replace("-", string.Empty); ;
                 }
 
-                if (dbContext.AddPublicDocs(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString(), file.FileName.ToString(), path.ToString(), md5Hash, DateTime.Now , (double)file.Length))
-                    return View("UploadFile");
-                else
-                    return View("UploadFailed");
+                return View("UploadFile");
             }
+            else
+                return View("UploadFailed");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateFilePublic(IFormFile file, string OwnerID, string OldFileName)
+        {
+            dbContext = HttpContext.RequestServices.GetService(typeof(TestWebAp.Models.DocsViewModel.DocsContextClass)) as Models.DocsViewModel.DocsContextClass;
+
+            if (file == null || file.Length == 0)
+                return View("UploadFailed");
+
+            string path = @"C:\\Users\\brand\\Desktop\\Userfiles\\" + dbContext.GetEmail(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString()) + @"\\" + file.FileName;
+
+            if (dbContext.updatePublicFile(OwnerID.ToString(), OldFileName.ToString(), file.FileName.ToString(), (double)file.Length))
+            {
+                using (FileStream stream = new FileStream(path, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                }
+
+                return View("UploadFile");
+            }
+            else
+                return View("UploadFailed");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateFilePrivate(IFormFile file, string OwnerID, string OldFileName)
+        {
+            dbContext = HttpContext.RequestServices.GetService(typeof(TestWebAp.Models.DocsViewModel.DocsContextClass)) as Models.DocsViewModel.DocsContextClass;
+
+            if (file == null || file.Length == 0)
+                return View("UploadFailed");
+
+            string path = @"C:\\Users\\brand\\Desktop\\Userfiles\\" + dbContext.GetEmail(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString()) + @"\\" + file.FileName;
+
+            if (dbContext.updatePrivateFile(OwnerID.ToString(), OldFileName.ToString(), file.FileName.ToString(), (double)file.Length))
+            {
+                using (FileStream stream = new FileStream(path, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                }
+
+                return View("UploadFile");
+            }
+            else
+                return View("UploadFailed");
         }
 
         public async Task<IActionResult> Download(string filename)
-        {
+            {
             dbContext = HttpContext.RequestServices.GetService(typeof(TestWebAp.Models.DocsViewModel.DocsContextClass)) as Models.DocsViewModel.DocsContextClass;
 
             if (filename == null)
                 return Content("filename not present");
 
-            var path = "C:\\Users\\brand\\Desktop\\Userfiles\\" + dbContext.GetEmail(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString()) + "\\" + filename;
+            string path = "C:\\Users\\brand\\Desktop\\Userfiles\\" + dbContext.GetEmail(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString()) + "\\" + filename;
 
             if (path != null)
             {
-                var memory = new MemoryStream();
-                using (var stream = new FileStream(path, FileMode.Open))
+                MemoryStream memory = new MemoryStream();
+                using (FileStream stream = new FileStream(path, FileMode.Open))
                 {
                     await stream.CopyToAsync(memory);
                 }
@@ -115,8 +155,8 @@ namespace TestWebAp.Controllers
 
             if (path != null)
             {
-                var memory = new MemoryStream();
-                using (var stream = new FileStream(path, FileMode.Open))
+                MemoryStream memory = new MemoryStream();
+                using (FileStream stream = new FileStream(path, FileMode.Open))
                 {
                     await stream.CopyToAsync(memory);
                 }
@@ -129,8 +169,8 @@ namespace TestWebAp.Controllers
 
         private string GetContentType(string path)
         {
-            var types = GetMimeTypes();
-            var ext = Path.GetExtension(path).ToLowerInvariant();
+            Dictionary<string, string> types = GetMimeTypes();
+            string ext = Path.GetExtension(path).ToLowerInvariant();
             return types[ext];
         }
 
@@ -157,6 +197,8 @@ namespace TestWebAp.Controllers
         public IActionResult PublicDocsView()
         {
             Models.DocsViewModel.DocsContextClass context = HttpContext.RequestServices.GetService(typeof(TestWebAp.Models.DocsViewModel.DocsContextClass)) as Models.DocsViewModel.DocsContextClass;
+
+            ViewBag.UserID = this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString();
 
             return View(context.GetAllFiles());
         }
@@ -201,6 +243,53 @@ namespace TestWebAp.Controllers
             Models.DocsViewModel.DocsContextClass context = HttpContext.RequestServices.GetService(typeof(TestWebAp.Models.DocsViewModel.DocsContextClass)) as Models.DocsViewModel.DocsContextClass;
 
             return View(context.GetSharedFiles(context.GetEmail(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString())));
+        }
+
+        public IActionResult DeletePrivateFile(string OwnerID, string filename, string path)
+        {
+            Models.DocsViewModel.DocsContextClass context = HttpContext.RequestServices.GetService(typeof(TestWebAp.Models.DocsViewModel.DocsContextClass)) as Models.DocsViewModel.DocsContextClass;
+
+            if (context.DeletePrivateFile(OwnerID, filename))
+            {
+                System.IO.File.Delete(path);
+                return View("PrivateDocsView", context.GetAllPrivateFiles(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString()));
+            }
+            else
+                return View();
+        }
+
+        public IActionResult DeletePublicFile(string OwnerID, string filename, string path)
+        {
+            Models.DocsViewModel.DocsContextClass context = HttpContext.RequestServices.GetService(typeof(TestWebAp.Models.DocsViewModel.DocsContextClass)) as Models.DocsViewModel.DocsContextClass;
+
+            if (context.DeletePublicFile(OwnerID, filename))
+            {
+                System.IO.File.Delete(path);
+                return View("PublicDocsView", context.GetAllFiles());
+            }
+            else
+                return View();
+        }
+
+        public IActionResult UpdatePublicFile(string OwnerID, string OldFileName)
+        {
+            DocsClass file = new DocsClass {
+                OwnerID = OwnerID,
+                Myfilenames = OldFileName
+            };
+
+            return View(file);
+        }
+
+        public IActionResult UpdatePrivateFile(string OwnerID, string OldFileName)
+        {
+            DocsClass file = new DocsClass
+            {
+                OwnerID = OwnerID,
+                Myfilenames = OldFileName
+            };
+
+            return View(file);
         }
 
     }
