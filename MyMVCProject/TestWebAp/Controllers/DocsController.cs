@@ -85,7 +85,7 @@ namespace TestWebAp.Controllers
 
             string path = @"C:\\Users\\brand\\Desktop\\Userfiles\\" + dbContext.GetEmail(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString()) + @"\\" + file.FileName;
 
-            if (dbContext.updatePublicFile(OwnerID.ToString(), OldFileName.ToString(), file.FileName.ToString(), (double)file.Length))
+            if (dbContext.updatePublicFile(OwnerID.ToString(), OldFileName, file.FileName, (double)file.Length))
             {
                 using (FileStream stream = new FileStream(path, FileMode.Create))
                 {
@@ -108,7 +108,7 @@ namespace TestWebAp.Controllers
 
             string path = @"C:\\Users\\brand\\Desktop\\Userfiles\\" + dbContext.GetEmail(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString()) + @"\\" + file.FileName;
 
-            if (dbContext.updatePrivateFile(OwnerID.ToString(), OldFileName.ToString(), file.FileName.ToString(), (double)file.Length))
+            if (dbContext.updatePrivateFile(OwnerID.ToString(), OldFileName, file.FileName, (double)file.Length))
             {
                 using (FileStream stream = new FileStream(path, FileMode.Create))
                 {

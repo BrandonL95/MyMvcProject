@@ -309,6 +309,7 @@ namespace TestWebAp.Models.DocsViewModel
                             {
                                 Myfiles.Add(new DocsClass()
                                 {
+                                    OwnerID = reader["OwnerID"].ToString(),
                                     Myfilenames = reader["FileName"].ToString(),
                                     Email = GetEmail(reader["OwnerID"].ToString())
                                 });

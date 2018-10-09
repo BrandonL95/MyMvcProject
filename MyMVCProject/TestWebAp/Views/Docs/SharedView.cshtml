@@ -15,7 +15,7 @@
                         <h5 class="card-title">@item.Myfilenames</h5>
                         <p>@item.Email</p>
                         <a asp-area="" asp-controller="Docs" asp-action="Downloadshared" asp-route-filename=@item.Myfilenames>Download</a>
-                        <a asp-area="" asp-controller="Docs" asp-action="UpdatePrivateFile" asp-route-filename=@item.Myfilenames>Update</a>
+                        <a asp-area="" asp-controller="Docs" asp-action="UpdatePrivateFile" asp-route-OwnerID=@item.OwnerID asp-route-OldFileName=@item.Myfilenames>Update</a>
                     </div>
                 </div>
             }
