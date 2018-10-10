@@ -27,7 +27,7 @@ namespace TestWebAp.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> UploadFilePrivate(IFormFile file, string OwnerID)
+        public async Task<IActionResult> UploadFilePrivate(IFormFile file)
         {
             dbContext = HttpContext.RequestServices.GetService(typeof(TestWebAp.Models.DocsViewModel.DocsContextClass)) as Models.DocsViewModel.DocsContextClass;
 
@@ -36,20 +36,17 @@ namespace TestWebAp.Controllers
 
             string path = @"C:\\Users\\brand\\Desktop\\Userfiles\\" + dbContext.GetEmail(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString()) + @"\\" + file.FileName;
 
-            string md5Hash;
-            using (var md5 = MD5.Create())
+            if (dbContext.AddPrivateDocs(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString(), file.FileName.ToString(), path.ToString(), DateTime.Now, (double)file.Length))
             {
                 using (FileStream stream = new FileStream(path, FileMode.Create))
                 {
                     await file.CopyToAsync(stream);
-                    md5Hash = BitConverter.ToString(md5.ComputeHash(stream)).Replace("-", string.Empty); ;
                 }
-            }
 
-                if (dbContext.AddPrivateDocs(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString(), file.FileName.ToString(), path.ToString(), md5Hash, DateTime.Now, (double)file.Length))
-                    return View("UploadFile");
-                else
-                    return View("UploadFailed");
+                return View("UploadFile");
+            }
+            else
+                return View("UploadFailed");
         }
 
         [HttpPost]
@@ -62,7 +59,7 @@ namespace TestWebAp.Controllers
 
             string path = @"C:\\Users\\brand\\Desktop\\Userfiles\\" + dbContext.GetEmail(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString()) + @"\\" + file.FileName;
 
-            if (dbContext.AddPublicDocs(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString(), file.FileName.ToString(), path.ToString(), "fg", DateTime.Now, (double)file.Length))
+            if (dbContext.AddPublicDocs(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString(), file.FileName.ToString(), path.ToString(), DateTime.Now, (double)file.Length))
             {
                 using (FileStream stream = new FileStream(path, FileMode.Create))
                 {
@@ -85,7 +82,7 @@ namespace TestWebAp.Controllers
 
             string path = @"C:\\Users\\brand\\Desktop\\Userfiles\\" + dbContext.GetEmail(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString()) + @"\\" + file.FileName;
 
-            if (dbContext.updatePublicFile(OwnerID.ToString(), OldFileName, file.FileName, (double)file.Length))
+            if (dbContext.updatePublicFile(OwnerID.ToString(), this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString(), OldFileName, file.FileName, (double)file.Length))
             {
                 using (FileStream stream = new FileStream(path, FileMode.Create))
                 {
@@ -108,7 +105,7 @@ namespace TestWebAp.Controllers
 
             string path = @"C:\\Users\\brand\\Desktop\\Userfiles\\" + dbContext.GetEmail(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString()) + @"\\" + file.FileName;
 
-            if (dbContext.updatePrivateFile(OwnerID.ToString(), OldFileName, file.FileName, (double)file.Length))
+            if (dbContext.updatePrivateFile(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString(), OwnerID.ToString(), OldFileName, file.FileName, (double)file.Length))
             {
                 using (FileStream stream = new FileStream(path, FileMode.Create))
                 {

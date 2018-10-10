@@ -23,7 +23,7 @@ namespace TestWebAp.Models.DocsViewModel
             return new MySqlConnection(ConnectionString);
         }
 
-        public bool AddPublicDocs(string UserID, string filename, string filePath, string md5, DateTime dateUploaded, double size)
+        public bool AddPublicDocs(string UserID, string filename, string filePath, DateTime dateUploaded, double size)
         {
             bool success = false;
 
@@ -33,11 +33,11 @@ namespace TestWebAp.Models.DocsViewModel
                 {
                     conn.Open();
 
-                    string sizeMB = (size / 1024).ToString("0.0") + " KB";
+                    string sizeKB = (size / 1024).ToString("0.0") + " KB";
 
-                    MySqlCommand cmd = new MySqlCommand("INSERT INTO publicdocs (OwnerID, FileName, FilePath, md5Checksum, DateUploaded, fileSize) VALUES (" + "'" + UserID + "','" + filename + "','" + filePath + "','" + md5 + "','" + dateUploaded + "','" + sizeMB + "');", conn);
+                    MySqlCommand cmd = new MySqlCommand("INSERT INTO publicdocs (OwnerID, FileName, FilePath, DateUploaded, FileSize) VALUES ('" + UserID + "','" + filename + "','" + filePath + "','" + dateUploaded + "','" + sizeKB + "');", conn);
 
-                    if (cmd.ExecuteNonQuery() == 1)
+                    if (cmd.ExecuteNonQuery() == 1 && LogFile(UserID, UserID, filename, "Created"))
                         success = true;
                 }
             }
@@ -49,7 +49,7 @@ namespace TestWebAp.Models.DocsViewModel
             return success;
         }
 
-        public bool AddPrivateDocs(string UserID, string filename, string filePath, string md5, DateTime dateUploaded, double size)
+        public bool AddPrivateDocs(string UserID, string filename, string filePath, DateTime dateUploaded, double size)
         {
             bool success = false;
 
@@ -59,11 +59,11 @@ namespace TestWebAp.Models.DocsViewModel
                 {
                     conn.Open();
 
-                    string sizeMB = (size / 1024).ToString("0.0") + " KB";
+                    string sizeKB = (size / 1024).ToString("0.0") + " KB";
 
-                    MySqlCommand cmd = new MySqlCommand("INSERT INTO privatedocs (OwnerID, FileName, FilePath, md5Checksum, DateUploaded, fileSize) VALUES (" + "'" + UserID + "','" + filename + "','" + filePath + "','" + md5 + "','" + dateUploaded + "','" + sizeMB + "');", conn);
+                    MySqlCommand cmd = new MySqlCommand("INSERT INTO privatedocs (OwnerID, FileName, FilePath, DateUploaded, FileSize) VALUES ('" + UserID + "','" + filename + "','" + filePath + "','" + dateUploaded + "','" + sizeKB + "');", conn);
 
-                    if (cmd.ExecuteNonQuery() == 1)
+                    if (cmd.ExecuteNonQuery() == 1 && LogFile(UserID, UserID, filename, "Created"))
                         success = true;
                 }
             }
@@ -152,62 +152,7 @@ namespace TestWebAp.Models.DocsViewModel
             return email;
         }
 
-        public bool getIDandFilename(string UserID, string Filename)
-        {
-            bool ifExists = false;
-            string id = "", filename = "";
-
-            using (MySqlConnection conn = GetConnection())
-            {
-                conn.Open();
-
-                DocsClass myFile = new DocsClass();
-
-                MySqlCommand cmd = new MySqlCommand("SELECT OwnerID, FileName FROM publicdocs", conn);
-
-                using (MySqlDataReader reader = cmd.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        if (!(UserID == id) && !(Filename == filename))
-                        {
-                            id = reader["id"].ToString();
-                            filename = reader["FileName"].ToString();
-                        }
-                        else
-                        {
-                            ifExists = true;
-                            break;
-                        }
-                    }
-                }
-            }
-            return ifExists;
-        }
-
-        public string getMd5Hash(string userID, string filename)
-        {
-            string md5Hash = "";
-
-            using (MySqlConnection conn = GetConnection())
-            {
-                conn.Open();
-
-                DocsClass myFile = new DocsClass();
-
-                MySqlCommand cmd = new MySqlCommand("SELECT md5Checksum FROM publicdocs WHERE OwnerID ='" + userID + "', FileName = '" + filename + "';", conn);
-
-                using (MySqlDataReader reader = cmd.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        md5Hash = reader["md5Checksum"].ToString();
-                    }
-                }
-
-                return md5Hash;
-            }
-        }
+        
 
         public string getPath(string email, string FileName)
         {
@@ -331,7 +276,7 @@ namespace TestWebAp.Models.DocsViewModel
             {
                 MySqlCommand cmd = new MySqlCommand("DELETE FROM privatedocs WHERE OwnerID = '" + OwnerID + "' AND FileName = '" + filename + "';", Conn);
                 Conn.Open();
-                if (cmd.ExecuteNonQuery() == 1)
+                if (cmd.ExecuteNonQuery() == 1 && LogFile(OwnerID, OwnerID, filename, "Deleted"))
                     deleted = true;
             }
 
@@ -346,14 +291,14 @@ namespace TestWebAp.Models.DocsViewModel
             {
                 MySqlCommand cmd = new MySqlCommand("DELETE FROM publicdocs WHERE OwnerID = '" + OwnerID + "' AND FileName = '" + filename + "';", Conn);
                 Conn.Open();
-                if (cmd.ExecuteNonQuery() == 1)
+                if (cmd.ExecuteNonQuery() == 1 && LogFile(OwnerID, OwnerID, filename, "Deleted"))
                     deleted = true;
             }
 
             return deleted;
         }
 
-        public bool updatePublicFile(string OwnerID, string oldfilename, string NewFileName, double fileSize)
+        public bool updatePublicFile(string currentUser, string OwnerID, string oldfilename, string NewFileName, double fileSize)
         {
             bool updated = false;
 
@@ -364,29 +309,53 @@ namespace TestWebAp.Models.DocsViewModel
                 MySqlCommand cmd = new MySqlCommand("UPDATE publicdocs SET FileName = '" + NewFileName + "', DateUploaded = '" + DateTime.Now + "', FileSize = '" + sizeMB + "' WHERE OwnerID = '" + OwnerID + "' AND FileName = '" + oldfilename + "';", Conn);
                 Conn.Open();
 
-                if (cmd.ExecuteNonQuery() == 1)
+                if (cmd.ExecuteNonQuery() == 1 && LogFile(OwnerID, currentUser, NewFileName, "Updated"))
                     updated = true;
             }
 
             return updated;
         }
 
-        public bool updatePrivateFile(string OwnerID, string oldfilename, string NewFileName, double fileSize)
+        public bool updatePrivateFile(string currentUser, string OwnerID, string oldfilename, string NewFileName, double fileSize)
         {
             bool updated = false;
 
             string sizeMB = (fileSize / 1024).ToString("0.0") + " KB";
-            string OF = OwnerID + "  " + oldfilename;
+
             using (MySqlConnection Conn = GetConnection())
             {
                 MySqlCommand cmd = new MySqlCommand("UPDATE privatedocs SET FileName = '" + NewFileName + "', DateUploaded = '" + DateTime.Now + "', FileSize = '" + sizeMB + "' WHERE OwnerID = '" + OwnerID + "' AND FileName = '" + oldfilename + "';", Conn);
                 Conn.Open();
 
-                if (cmd.ExecuteNonQuery() == 1)
+                if (cmd.ExecuteNonQuery() == 1 && LogFile(OwnerID, currentUser, NewFileName, "Updated"))
                     updated = true;
             }
 
             return updated;
+        }
+
+        public bool LogFile(string ownerID, string updatedBy, string filename, string action)
+        {
+            bool logWritten = false;
+
+            try
+            {
+                using (MySqlConnection conn = GetConnection())
+                {
+                    conn.Open();
+
+                    MySqlCommand cmd = new MySqlCommand("INSERT INTO logtable (ownerEmail, updatedBy, filename, action, dateOfAction) VALUES (" + "'" + GetEmail(ownerID) + "','" + GetEmail(updatedBy) + "','" + filename + "','" + action + "','" + DateTime.Now + "');", conn);
+
+                    if (cmd.ExecuteNonQuery() == 1)
+                        logWritten = true;
+                }
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+
+            return logWritten;
         }
     }
 }
