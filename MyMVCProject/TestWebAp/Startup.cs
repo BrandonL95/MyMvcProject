@@ -46,6 +46,7 @@ namespace TestWebAp
             services.Configure<AuthMessageSenderOptions>(Configuration);
 
             services.Add(new ServiceDescriptor(typeof(Models.DocsViewModel.DocsContextClass), new Models.DocsViewModel.DocsContextClass(Configuration.GetConnectionString("DefaultConnection"))));
+            services.Add(new ServiceDescriptor(typeof(Models.LogsViewModel.Log), new Models.LogsViewModel.Log(Configuration.GetConnectionString("DefaultConnection"))));
             services.Add(new ServiceDescriptor(typeof(Models.AccountViewModels.UserDBContext), new Models.AccountViewModels.UserDBContext(Configuration.GetConnectionString("DefaultConnection"))));
 
             services.AddMvc();

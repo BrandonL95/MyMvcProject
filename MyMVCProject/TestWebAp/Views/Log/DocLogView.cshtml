@@ -1,0 +1,30 @@
+﻿@model IEnumerable<TestWebAp.Models.LogsViewModel.Log>
+@{
+    ViewData["Title"] = "Document Log";
+}
+
+<body>
+    <h1>Document Log</h1>
+    <br>
+    <div class="container ">
+        <div class="row">
+            <table class="table">
+                <tr>
+                    <th scope="col">File Name</th>
+                    <th scope="col">Eddited By</th>
+                    <th scope="col">Action</th>
+                    <th scope="col">date</th>
+                </tr>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <th scope="row">@item.FileName</th>
+                        <td>@item.UpdatedBy</td>
+                        <td>@item.action</td>
+                        <td>@item.date</td>
+                    </tr>
+                }
+             </table>
+        </div>
+    </div>
+</body>
