@@ -12,11 +12,11 @@ namespace TestWebAp.Controllers
     {
         Log LogContext;
 
-        public IActionResult DocLogView()
+        public IActionResult DocLogView(string filename)
         {
             LogContext = HttpContext.RequestServices.GetService(typeof(TestWebAp.Models.LogsViewModel.Log)) as Models.LogsViewModel.Log;
 
-            return View(LogContext.GetLog(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString()));
+            return View(LogContext.GetLog(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString(), filename));
         }
     }
 }

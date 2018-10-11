@@ -18,6 +18,7 @@
                         <a asp-area="" asp-controller="Docs" asp-action="UpdatePublicFile" asp-route-OwnerID=@item.OwnerID asp-route-OldFileName=@item.Myfilenames>Update</a>
                         @if (ViewBag.UserID == item.OwnerID.ToString())
                         {
+                            <a asp-area="" asp-controller="Log" asp-action="DocLogView" asp-route-OwnerID=@item.OwnerID asp-route-filename=@item.Myfilenames>History Log</a>
                             <a asp-area="" asp-controller="Docs" asp-action="DeletePublicFile" asp-route-OwnerID=@item.OwnerID asp-route-filename=@item.Myfilenames asp-route-path=@item.docPath>Delete</a>
                         }
                     </div>

@@ -34,14 +34,14 @@ namespace TestWebAp.Models.LogsViewModel
             return new MySqlConnection(ConnectionString);
         }
 
-        public List<Log> GetLog(string OwnerID)
+        public List<Log> GetLog(string OwnerID, string FileName)
         {
             List<Log> Mylog = new List<Log>();
 
             using (MySqlConnection conn = GetConnection())
             {
                 conn.Open();
-                MySqlCommand cmd = new MySqlCommand("SELECT ownerEmail, updatedBy, filename, action, dateOfAction FROM logtable WHERE ownerEmail = '" + GetEmail(OwnerID) + "';", conn);
+                MySqlCommand cmd = new MySqlCommand("SELECT ownerEmail, updatedBy, filename, action, dateOfAction FROM logtable WHERE ownerEmail = '" + GetEmail(OwnerID) + "' AND filename = '" + FileName + "';", conn);
 
                 using (var reader = cmd.ExecuteReader())
                 {
