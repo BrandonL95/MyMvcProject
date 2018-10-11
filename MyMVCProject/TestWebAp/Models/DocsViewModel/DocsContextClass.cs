@@ -41,9 +41,10 @@ namespace TestWebAp.Models.DocsViewModel
                         success = true;
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return false;
+                System.ArgumentException argEx = new System.ArgumentException("Document not inserted", "Public Document", ex);
+                throw argEx;
             }
 
             return success;
@@ -67,9 +68,10 @@ namespace TestWebAp.Models.DocsViewModel
                         success = true;
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return false;
+                System.ArgumentException argEx = new System.ArgumentException("Document not inserted", "Private Document", ex);
+                throw argEx;
             }
 
             return success;
@@ -78,27 +80,34 @@ namespace TestWebAp.Models.DocsViewModel
         public List<DocsClass> GetAllFiles()
         {
             List<DocsClass> Myfiles = new List<DocsClass>();
-
-            using (MySqlConnection conn = GetConnection())
+            try
             {
-                conn.Open();
-                MySqlCommand cmd = new MySqlCommand("SELECT OwnerID, FileName, FilePath FROM publicdocs", conn);
-
-                using (var reader = cmd.ExecuteReader())
+                using (MySqlConnection conn = GetConnection())
                 {
-                    while (reader.Read())
-                    {
-                        Myfiles.Add(new DocsClass()
-                        {
-                            Myfilenames = reader["FileName"].ToString(),
-                            Email = GetEmail(reader["OwnerID"].ToString()),
-                            OwnerID = reader["OwnerID"].ToString(),
-                            docPath = reader["FilePath"].ToString()
-                        });
-                    }
-                }
+                    conn.Open();
+                    MySqlCommand cmd = new MySqlCommand("SELECT OwnerID, FileName, FilePath FROM publicdocs", conn);
 
-                return Myfiles;
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            Myfiles.Add(new DocsClass()
+                            {
+                                Myfilenames = reader["FileName"].ToString(),
+                                Email = GetEmail(reader["OwnerID"].ToString()),
+                                OwnerID = reader["OwnerID"].ToString(),
+                                docPath = reader["FilePath"].ToString()
+                            });
+                        }
+                    }
+
+                    return Myfiles;
+                }
+            }
+            catch(Exception ex)
+            {
+                System.ArgumentException argEx = new System.ArgumentException("Empty List", "Get Public Files", ex);
+                throw argEx;
             }
         }
 
@@ -106,26 +115,34 @@ namespace TestWebAp.Models.DocsViewModel
         {
             List<DocsClass> Myfiles = new List<DocsClass>();
 
-            using (MySqlConnection conn = GetConnection())
+            try
             {
-                conn.Open();
-                MySqlCommand cmd = new MySqlCommand("SELECT OwnerID, FileName, FilePath FROM privatedocs Where OwnerID = '" + userID + "';", conn);
-
-                using (var reader = cmd.ExecuteReader())
+                using (MySqlConnection conn = GetConnection())
                 {
-                    while (reader.Read())
+                    conn.Open();
+                    MySqlCommand cmd = new MySqlCommand("SELECT OwnerID, FileName, FilePath FROM privatedocs Where OwnerID = '" + userID + "';", conn);
+
+                    using (var reader = cmd.ExecuteReader())
                     {
-                        Myfiles.Add(new DocsClass()
+                        while (reader.Read())
                         {
-                            Myfilenames = reader["FileName"].ToString(),
-                            OwnerID = reader["OwnerID"].ToString(),
-                            docPath = reader["FilePath"].ToString()
+                            Myfiles.Add(new DocsClass()
+                            {
+                                Myfilenames = reader["FileName"].ToString(),
+                                OwnerID = reader["OwnerID"].ToString(),
+                                docPath = reader["FilePath"].ToString()
 
-                        });
+                            });
+                        }
                     }
-                }
 
-                return Myfiles;
+                    return Myfiles;
+                }
+            }
+            catch(Exception ex)
+            {
+                System.ArgumentException argEx = new System.ArgumentException("Empty List", "Get Private Files", ex);
+                throw argEx;
             }
         }
 
@@ -133,57 +150,73 @@ namespace TestWebAp.Models.DocsViewModel
         {
             string email = "";
 
-            using (MySqlConnection conn = GetConnection())
+            try
             {
-                conn.Open();
-
-                DocsClass myFile = new DocsClass();
-
-                MySqlCommand cmd = new MySqlCommand("SELECT Email FROM users WHERE Id ='" + userID + "';", conn);
-
-                using (MySqlDataReader reader = cmd.ExecuteReader())
+                using (MySqlConnection conn = GetConnection())
                 {
-                    while (reader.Read())
+                    conn.Open();
+
+                    DocsClass myFile = new DocsClass();
+
+                    MySqlCommand cmd = new MySqlCommand("SELECT Email FROM users WHERE Id ='" + userID + "';", conn);
+
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
-                        email = reader["Email"].ToString();
+                        while (reader.Read())
+                        {
+                            email = reader["Email"].ToString();
+                        }
                     }
                 }
+                return email;
             }
-            return email;
+            catch(Exception ex)
+            {
+                System.ArgumentException argEx = new System.ArgumentException("Invalid UserID", "Get Email", ex);
+                throw argEx;
+            }
         }
 
         
 
         public string getPath(string email, string FileName)
         {
-            using (MySqlConnection conn = GetConnection())
+            try
             {
-                List<string> collaberators = new List<string>();
-                string MyPath = "";
-
-                conn.Open();
-                MySqlCommand cmd = new MySqlCommand("SELECT OwnerID, FileName FROM privatedocs", conn);
-
-                using (MySqlDataReader reader = cmd.ExecuteReader())
+                using (MySqlConnection conn = GetConnection())
                 {
-                    while (reader.Read())
-                    {
-                        string filename = reader["FileName"].ToString();
-                        string ownerID = reader["OwnerID"].ToString();
+                    List<string> collaberators = new List<string>();
+                    string MyPath = "";
 
-                        collaberators = readColaberatorFile(ownerID, filename);
-                        int c = collaberators.Count;
-                        for (int k = 0; k < collaberators.Count; k++)
+                    conn.Open();
+                    MySqlCommand cmd = new MySqlCommand("SELECT OwnerID, FileName FROM privatedocs", conn);
+
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
                         {
-                            if (collaberators[k].ToString() == email && FileName == filename)
+                            string filename = reader["FileName"].ToString();
+                            string ownerID = reader["OwnerID"].ToString();
+
+                            collaberators = readColaberatorFile(ownerID, filename);
+                            int c = collaberators.Count;
+                            for (int k = 0; k < collaberators.Count; k++)
                             {
-                                MyPath = "C:\\Users\\brand\\Desktop\\Userfiles\\" + GetEmail(ownerID) + "\\" + FileName;
-                                break;
+                                if (collaberators[k].ToString() == email && FileName == filename)
+                                {
+                                    MyPath = "C:\\Users\\brand\\Desktop\\Userfiles\\" + GetEmail(ownerID) + "\\" + FileName;
+                                    break;
+                                }
                             }
                         }
                     }
+                    return MyPath;
                 }
-                return MyPath;
+            }
+            catch(Exception ex)
+            {
+                System.ArgumentException argEx = new System.ArgumentException("Invalid Path", "Path", ex);
+                throw argEx;
             }
         }
 
@@ -197,9 +230,10 @@ namespace TestWebAp.Models.DocsViewModel
 
                 sw.Close();
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Console.WriteLine("Exception: " + e.Message);
+                System.ArgumentException argEx = new System.ArgumentException("File Not Written", "Colaberator File", ex);
+                throw argEx;
             }
         }
 
@@ -220,9 +254,10 @@ namespace TestWebAp.Models.DocsViewModel
 
                 }
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Console.WriteLine("Exception: " + e.Message);
+                System.ArgumentException argEx = new System.ArgumentException("File Not Read", "Colaberator File", ex);
+                throw argEx;
             }
 
             return colaberators;
@@ -232,38 +267,46 @@ namespace TestWebAp.Models.DocsViewModel
         {
             List<DocsClass> Myfiles = new List<DocsClass>();
 
-            using (MySqlConnection conn = GetConnection())
+            try
             {
-                List<string> collaberators = new List<string>();
-
-                conn.Open();
-                MySqlCommand cmd = new MySqlCommand("SELECT OwnerID, FileName FROM privatedocs", conn);
-
-                using (MySqlDataReader reader = cmd.ExecuteReader())
+                using (MySqlConnection conn = GetConnection())
                 {
-                    while (reader.Read())
-                    {
-                        string filename = reader["FileName"].ToString();
-                        string ownerID = reader["OwnerID"].ToString();
+                    List<string> collaberators = new List<string>();
 
-                        collaberators = readColaberatorFile(ownerID, filename);
-                        int c = collaberators.Count;
-                        for (int k = 0; k < collaberators.Count; k++)
+                    conn.Open();
+                    MySqlCommand cmd = new MySqlCommand("SELECT OwnerID, FileName FROM privatedocs", conn);
+
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
                         {
-                            if (collaberators[k].ToString() == email)
+                            string filename = reader["FileName"].ToString();
+                            string ownerID = reader["OwnerID"].ToString();
+
+                            collaberators = readColaberatorFile(ownerID, filename);
+                            int c = collaberators.Count;
+                            for (int k = 0; k < collaberators.Count; k++)
                             {
-                                Myfiles.Add(new DocsClass()
+                                if (collaberators[k].ToString() == email)
                                 {
-                                    OwnerID = reader["OwnerID"].ToString(),
-                                    Myfilenames = reader["FileName"].ToString(),
-                                    Email = GetEmail(reader["OwnerID"].ToString())
-                                });
+                                    Myfiles.Add(new DocsClass()
+                                    {
+                                        OwnerID = reader["OwnerID"].ToString(),
+                                        Myfilenames = reader["FileName"].ToString(),
+                                        Email = GetEmail(reader["OwnerID"].ToString())
+                                    });
+                                }
                             }
                         }
                     }
-                }
 
-                return Myfiles;
+                    return Myfiles;
+                }
+            }
+            catch(Exception ex)
+            {
+                System.ArgumentException argEx = new System.ArgumentException("Empty List", "Shared Files", ex);
+                throw argEx;
             }
 
         }
@@ -272,12 +315,20 @@ namespace TestWebAp.Models.DocsViewModel
         {
             bool deleted = false;
 
-            using(MySqlConnection Conn = GetConnection())
+            try
             {
-                MySqlCommand cmd = new MySqlCommand("DELETE FROM privatedocs WHERE OwnerID = '" + OwnerID + "' AND FileName = '" + filename + "';", Conn);
-                Conn.Open();
-                if (cmd.ExecuteNonQuery() == 1 && LogFile(OwnerID, OwnerID, filename, "Deleted"))
-                    deleted = true;
+                using (MySqlConnection Conn = GetConnection())
+                {
+                    MySqlCommand cmd = new MySqlCommand("DELETE FROM privatedocs WHERE OwnerID = '" + OwnerID + "' AND FileName = '" + filename + "';", Conn);
+                    Conn.Open();
+                    if (cmd.ExecuteNonQuery() == 1 && LogFile(OwnerID, OwnerID, filename, "Deleted"))
+                        deleted = true;
+                }
+            }
+            catch(Exception ex)
+            {
+                System.ArgumentException argEx = new System.ArgumentException("File Not Deleted", "Private File", ex);
+                throw argEx;
             }
 
             return deleted;
@@ -287,12 +338,20 @@ namespace TestWebAp.Models.DocsViewModel
         {
             bool deleted = false;
 
-            using (MySqlConnection Conn = GetConnection())
+            try
             {
-                MySqlCommand cmd = new MySqlCommand("DELETE FROM publicdocs WHERE OwnerID = '" + OwnerID + "' AND FileName = '" + filename + "';", Conn);
-                Conn.Open();
-                if (cmd.ExecuteNonQuery() == 1 && LogFile(OwnerID, OwnerID, filename, "Deleted"))
-                    deleted = true;
+                using (MySqlConnection Conn = GetConnection())
+                {
+                    MySqlCommand cmd = new MySqlCommand("DELETE FROM publicdocs WHERE OwnerID = '" + OwnerID + "' AND FileName = '" + filename + "';", Conn);
+                    Conn.Open();
+                    if (cmd.ExecuteNonQuery() == 1 && LogFile(OwnerID, OwnerID, filename, "Deleted"))
+                        deleted = true;
+                }
+            }
+            catch(Exception ex)
+            {
+                System.ArgumentException argEx = new System.ArgumentException("File Not Deleted", "Public File", ex);
+                throw argEx;
             }
 
             return deleted;
@@ -302,15 +361,23 @@ namespace TestWebAp.Models.DocsViewModel
         {
             bool updated = false;
 
-            string sizeMB = (fileSize / 1024).ToString("0.0") + " KB";
-            string OF = OwnerID + "  " + oldfilename;
-            using (MySqlConnection Conn = GetConnection())
+            try
             {
-                MySqlCommand cmd = new MySqlCommand("UPDATE publicdocs SET FileName = '" + NewFileName + "', DateUploaded = '" + DateTime.Now + "', FileSize = '" + sizeMB + "' WHERE OwnerID = '" + OwnerID + "' AND FileName = '" + oldfilename + "';", Conn);
-                Conn.Open();
+                string sizeMB = (fileSize / 1024).ToString("0.0") + " KB";
+                string OF = OwnerID + "  " + oldfilename;
+                using (MySqlConnection Conn = GetConnection())
+                {
+                    MySqlCommand cmd = new MySqlCommand("UPDATE publicdocs SET FileName = '" + NewFileName + "', DateUploaded = '" + DateTime.Now + "', FileSize = '" + sizeMB + "' WHERE OwnerID = '" + OwnerID + "' AND FileName = '" + oldfilename + "';", Conn);
+                    Conn.Open();
 
-                if (cmd.ExecuteNonQuery() == 1 && LogFile(OwnerID, currentUser, NewFileName, "Updated"))
-                    updated = true;
+                    if (cmd.ExecuteNonQuery() == 1 && LogFile(OwnerID, currentUser, NewFileName, "Updated"))
+                        updated = true;
+                }
+            }
+            catch(Exception ex)
+            {
+                System.ArgumentException argEx = new System.ArgumentException("File Not Updated", "Public File", ex);
+                throw argEx;
             }
 
             return updated;
@@ -320,15 +387,23 @@ namespace TestWebAp.Models.DocsViewModel
         {
             bool updated = false;
 
-            string sizeMB = (fileSize / 1024).ToString("0.0") + " KB";
-
-            using (MySqlConnection Conn = GetConnection())
+            try
             {
-                MySqlCommand cmd = new MySqlCommand("UPDATE privatedocs SET FileName = '" + NewFileName + "', DateUploaded = '" + DateTime.Now + "', FileSize = '" + sizeMB + "' WHERE OwnerID = '" + OwnerID + "' AND FileName = '" + oldfilename + "';", Conn);
-                Conn.Open();
+                string sizeMB = (fileSize / 1024).ToString("0.0") + " KB";
 
-                if (cmd.ExecuteNonQuery() == 1 && LogFile(OwnerID, currentUser, NewFileName, "Updated"))
-                    updated = true;
+                using (MySqlConnection Conn = GetConnection())
+                {
+                    MySqlCommand cmd = new MySqlCommand("UPDATE privatedocs SET FileName = '" + NewFileName + "', DateUploaded = '" + DateTime.Now + "', FileSize = '" + sizeMB + "' WHERE OwnerID = '" + OwnerID + "' AND FileName = '" + oldfilename + "';", Conn);
+                    Conn.Open();
+
+                    if (cmd.ExecuteNonQuery() == 1 && LogFile(OwnerID, currentUser, NewFileName, "Updated"))
+                        updated = true;
+                }
+            }
+            catch(Exception ex)
+            {
+                System.ArgumentException argEx = new System.ArgumentException("File Not Updated", "Private File", ex);
+                throw argEx;
             }
 
             return updated;
@@ -350,9 +425,10 @@ namespace TestWebAp.Models.DocsViewModel
                         logWritten = true;
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return false;
+                System.ArgumentException argEx = new System.ArgumentException("LogFile Not Inserted", "LogFile", ex);
+                throw argEx;
             }
 
             return logWritten;

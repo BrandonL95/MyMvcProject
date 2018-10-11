@@ -38,27 +38,35 @@ namespace TestWebAp.Models.LogsViewModel
         {
             List<Log> Mylog = new List<Log>();
 
-            using (MySqlConnection conn = GetConnection())
+            try
             {
-                conn.Open();
-                MySqlCommand cmd = new MySqlCommand("SELECT ownerEmail, updatedBy, filename, action, dateOfAction FROM logtable WHERE ownerEmail = '" + GetEmail(OwnerID) + "' AND filename = '" + FileName + "';", conn);
-
-                using (var reader = cmd.ExecuteReader())
+                using (MySqlConnection conn = GetConnection())
                 {
-                    while (reader.Read())
-                    {
-                        Mylog.Add(new Log()
-                        {
-                            OwnerEmail = reader["ownerEmail"].ToString(),
-                            UpdatedBy = reader["updatedBy"].ToString(),
-                            FileName = reader["filename"].ToString(),
-                            action = reader["action"].ToString(),
-                            date = reader["dateOfAction"].ToString()
-                        });
-                    }
-                }
+                    conn.Open();
+                    MySqlCommand cmd = new MySqlCommand("SELECT ownerEmail, updatedBy, filename, action, dateOfAction FROM logtable WHERE ownerEmail = '" + GetEmail(OwnerID) + "' AND filename = '" + FileName + "';", conn);
 
-                return Mylog;
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            Mylog.Add(new Log()
+                            {
+                                OwnerEmail = reader["ownerEmail"].ToString(),
+                                UpdatedBy = reader["updatedBy"].ToString(),
+                                FileName = reader["filename"].ToString(),
+                                action = reader["action"].ToString(),
+                                date = reader["dateOfAction"].ToString()
+                            });
+                        }
+                    }
+
+                    return Mylog;
+                }
+            }
+            catch(Exception ex)
+            {
+                System.ArgumentException argEx = new System.ArgumentException("Empty List", "Empty", ex);
+                throw argEx;
             }
 
         }
@@ -67,23 +75,31 @@ namespace TestWebAp.Models.LogsViewModel
         {
             string email = "";
 
-            using (MySqlConnection conn = GetConnection())
+            try
             {
-                conn.Open();
-
-                DocsClass myFile = new DocsClass();
-
-                MySqlCommand cmd = new MySqlCommand("SELECT Email FROM users WHERE Id ='" + userID + "';", conn);
-
-                using (MySqlDataReader reader = cmd.ExecuteReader())
+                using (MySqlConnection conn = GetConnection())
                 {
-                    while (reader.Read())
+                    conn.Open();
+
+                    DocsClass myFile = new DocsClass();
+
+                    MySqlCommand cmd = new MySqlCommand("SELECT Email FROM users WHERE Id ='" + userID + "';", conn);
+
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
-                        email = reader["Email"].ToString();
+                        while (reader.Read())
+                        {
+                            email = reader["Email"].ToString();
+                        }
                     }
                 }
+                return email;
             }
-            return email;
+            catch(Exception ex)
+            {
+                System.ArgumentException argEx = new System.ArgumentException("Invalid Email", "User Email", ex);
+                throw argEx;
+            }
         }
     }
 }
