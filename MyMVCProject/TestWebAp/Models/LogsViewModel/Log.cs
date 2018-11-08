@@ -22,7 +22,8 @@ namespace TestWebAp.Models.LogsViewModel
         public string ConnectionString { get; set; }
 
 
-        public Log() { }
+        public Log()
+        {}
 
         public Log(string Connection)
         {
@@ -43,7 +44,11 @@ namespace TestWebAp.Models.LogsViewModel
                 using (MySqlConnection conn = GetConnection())
                 {
                     conn.Open();
-                    MySqlCommand cmd = new MySqlCommand("SELECT ownerEmail, updatedBy, filename, action, dateOfAction FROM logtable WHERE ownerEmail = '" + GetEmail(OwnerID) + "' AND filename = '" + FileName + "';", conn);
+
+                    MySqlCommand cmd = new MySqlCommand("SELECT ownerEmail, updatedBy, filename, action, dateOfAction FROM logtable WHERE ownerEmail = @OwnerEmail AND filename = @FileName;", conn);
+
+                    cmd.Parameters.AddWithValue("@OwnerEmail", GetEmail(OwnerID));
+                    cmd.Parameters.AddWithValue("@FileName", FileName);
 
                     using (var reader = cmd.ExecuteReader())
                     {
@@ -83,7 +88,9 @@ namespace TestWebAp.Models.LogsViewModel
 
                     DocsClass myFile = new DocsClass();
 
-                    MySqlCommand cmd = new MySqlCommand("SELECT Email FROM users WHERE Id ='" + userID + "';", conn);
+                    MySqlCommand cmd = new MySqlCommand("SELECT Email FROM users WHERE Id = @userID;", conn);
+
+                    cmd.Parameters.AddWithValue("@userID", userID);
 
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {

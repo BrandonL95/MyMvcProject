@@ -1,0 +1,24 @@
+﻿@model IEnumerable<TestWebAp.Models.DocsViewModel.DocsClass>
+@{
+    ViewBag.Title = "Delete Colaberator";
+}
+
+<body>
+
+    <h2>Collaberator to delete on file @ViewBag.Filename </h2>
+
+    <table class="table">
+        <tr>
+            <th>Available Collaberators</th>
+        </tr>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    <a asp-area="" asp-controller="Docs" asp-action="DeleteColaberator" asp-route-email=@item.Email asp-route-filename=@ViewBag.Filename>@Html.DisplayFor(modelItem => item.Email)</a>
+                </td>
+            </tr>
+        }
+    </table>
+
+</body>

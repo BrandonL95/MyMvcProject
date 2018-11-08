@@ -8,6 +8,7 @@ using System.IO;
 using TestWebAp.Models.DocsViewModel;
 using System.Security.Claims;
 using System.Security.Cryptography;
+using TestWebAp.Models.AccountViewModels;
 
 namespace TestWebAp.Controllers
 {
@@ -148,7 +149,7 @@ namespace TestWebAp.Controllers
             if (filename == null)
                 return Content("filename not present");
 
-            var path = dbContext.getPath(dbContext.GetEmail(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString()), filename);
+            string path = dbContext.getPath(dbContext.GetEmail(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString()), filename);
 
             if (path != null)
             {
@@ -224,6 +225,26 @@ namespace TestWebAp.Controllers
             ViewBag.Filename = filename;
 
             return View("AddCollaberatorView", context.GetAllUsers());
+        }
+
+        public IActionResult DeleteColabView(string filename)
+        {
+            Models.DocsViewModel.DocsContextClass dbcontext = HttpContext.RequestServices.GetService(typeof(TestWebAp.Models.DocsViewModel.DocsContextClass)) as Models.DocsViewModel.DocsContextClass;
+
+            ViewBag.Filename = filename;
+
+            List<DocsClass> ColabEmail = dbcontext.GetColabView(dbcontext.GetEmail(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString()), filename);
+
+            return View("DeleteColabView", ColabEmail);
+        }
+
+        public IActionResult DeleteColaberator(string email, string filename)
+        {
+            Models.DocsViewModel.DocsContextClass context = HttpContext.RequestServices.GetService(typeof(TestWebAp.Models.DocsViewModel.DocsContextClass)) as Models.DocsViewModel.DocsContextClass;
+
+            context.ReWriteColabFile(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString(), filename, email);
+
+            return View("PrivateDocsView", context.GetAllPrivateFiles(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString()));
         }
 
         public IActionResult WriteColaberatorFile(string email, string filename)

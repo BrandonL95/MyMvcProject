@@ -1,11 +1,19 @@
-﻿@{
+﻿@using Microsoft.AspNetCore.Identity
+
+@inject SignInManager<ApplicationUser> SignInManager
+
+@{
     ViewData["Title"] = "Home Page";
 }
 
 <h1>Welcome to EC Docs</h1>
-<br />
-<a asp-area="" asp-controller="Docs" asp-action="DocsView" class="navbar-brand">Upload a File</a>
-<br />
-<a asp-area="" asp-controller="Docs" asp-action="MyFilesView" class="navbar-brand">View Existing Files</a>
-<br />
-<a asp-area="" asp-controller="Chat" asp-action="ChatView" class="navbar-brand">Online Chat</a>
+
+@if (SignInManager.IsSignedIn(User))
+ {
+    <br />
+    <a asp-area="" asp-controller="Docs" asp-action="DocsView" class="navbar-brand">Upload a File</a>
+    <br />
+    <a asp-area="" asp-controller="Docs" asp-action="MyFilesView" class="navbar-brand">View Existing Files</a>
+    <br />
+    <a asp-area="" asp-controller="Chat" asp-action="ChatView" class="navbar-brand">Online Chat</a>
+ }

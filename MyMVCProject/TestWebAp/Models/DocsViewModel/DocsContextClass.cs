@@ -35,7 +35,13 @@ namespace TestWebAp.Models.DocsViewModel
 
                     string sizeKB = (size / 1024).ToString("0.0") + " KB";
 
-                    MySqlCommand cmd = new MySqlCommand("INSERT INTO publicdocs (OwnerID, FileName, FilePath, DateUploaded, FileSize) VALUES ('" + UserID + "','" + filename + "','" + filePath + "','" + dateUploaded + "','" + sizeKB + "');", conn);
+                    MySqlCommand cmd = new MySqlCommand("INSERT INTO publicdocs (OwnerID, FileName, FilePath, DateUploaded, FileSize) VALUES (@UserID, @filename, @filePath, @dateUploaded, @sizeKB);", conn);
+
+                    cmd.Parameters.AddWithValue("@UserID", UserID);
+                    cmd.Parameters.AddWithValue("@filename", filename);
+                    cmd.Parameters.AddWithValue("@filePath", filePath);
+                    cmd.Parameters.AddWithValue("@dateUploaded", dateUploaded);
+                    cmd.Parameters.AddWithValue("@sizeKB", sizeKB);
 
                     if (cmd.ExecuteNonQuery() == 1 && LogFile(UserID, UserID, filename, "Created"))
                         success = true;
@@ -62,7 +68,13 @@ namespace TestWebAp.Models.DocsViewModel
 
                     string sizeKB = (size / 1024).ToString("0.0") + " KB";
 
-                    MySqlCommand cmd = new MySqlCommand("INSERT INTO privatedocs (OwnerID, FileName, FilePath, DateUploaded, FileSize) VALUES ('" + UserID + "','" + filename + "','" + filePath + "','" + dateUploaded + "','" + sizeKB + "');", conn);
+                    MySqlCommand cmd = new MySqlCommand("INSERT INTO privatedocs (OwnerID, FileName, FilePath, DateUploaded, FileSize) VALUES (@UserID , @filename, @filePath, @dateUploaded, @sizeKB);", conn);
+
+                    cmd.Parameters.AddWithValue("@UserID", UserID);
+                    cmd.Parameters.AddWithValue("@filename", filename);
+                    cmd.Parameters.AddWithValue("@filePath", filePath);
+                    cmd.Parameters.AddWithValue("@dateUploaded", dateUploaded);
+                    cmd.Parameters.AddWithValue("@sizeKB", sizeKB);
 
                     if (cmd.ExecuteNonQuery() == 1 && LogFile(UserID, UserID, filename, "Created"))
                         success = true;
@@ -120,7 +132,9 @@ namespace TestWebAp.Models.DocsViewModel
                 using (MySqlConnection conn = GetConnection())
                 {
                     conn.Open();
-                    MySqlCommand cmd = new MySqlCommand("SELECT OwnerID, FileName, FilePath FROM privatedocs Where OwnerID = '" + userID + "';", conn);
+                    MySqlCommand cmd = new MySqlCommand("SELECT OwnerID, FileName, FilePath FROM privatedocs Where OwnerID = @userID;", conn);
+
+                    cmd.Parameters.AddWithValue("@userID", userID);
 
                     using (var reader = cmd.ExecuteReader())
                     {
@@ -158,7 +172,9 @@ namespace TestWebAp.Models.DocsViewModel
 
                     DocsClass myFile = new DocsClass();
 
-                    MySqlCommand cmd = new MySqlCommand("SELECT Email FROM users WHERE Id ='" + userID + "';", conn);
+                    MySqlCommand cmd = new MySqlCommand("SELECT Email FROM users WHERE Id = @userID;", conn);
+
+                    cmd.Parameters.AddWithValue("@userID", userID);
 
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
@@ -175,9 +191,7 @@ namespace TestWebAp.Models.DocsViewModel
                 System.ArgumentException argEx = new System.ArgumentException("Invalid UserID", "Get Email", ex);
                 throw argEx;
             }
-        }
-
-        
+        }     
 
         public string getPath(string email, string FileName)
         {
@@ -220,6 +234,35 @@ namespace TestWebAp.Models.DocsViewModel
             }
         }
 
+        public void ReWriteColabFile(string ownerID, string filename, string userEmail)
+        {
+            List<string> Colabs = readColaberatorFile(ownerID, filename);
+
+            try
+            {
+                foreach (string email in Colabs)
+                {
+                    if (email != userEmail)
+                    {
+                        StreamWriter sw = new StreamWriter("C:\\Users\\brand\\Desktop\\Userfiles\\" + GetEmail(ownerID) + "\\" + filename.Remove(filename.LastIndexOf("."), 1) + "Collaberators1.txt", true);
+
+                        sw.WriteLine(email);
+
+                        sw.Close();
+                    }
+                }
+
+                File.Delete("C:\\Users\\brand\\Desktop\\Userfiles\\" + GetEmail(ownerID) + "\\" + filename.Remove(filename.LastIndexOf("."), 1) + "Collaberators.txt");
+                File.Move("C:\\Users\\brand\\Desktop\\Userfiles\\" + GetEmail(ownerID) + "\\" + filename.Remove(filename.LastIndexOf("."), 1) + "Collaberators1.txt", "C:\\Users\\brand\\Desktop\\Userfiles\\" + GetEmail(ownerID) + "\\" + filename.Remove(filename.LastIndexOf("."), 1) + "Collaberators.txt");
+            }
+            catch (Exception ex)
+            {
+                System.ArgumentException argEx = new System.ArgumentException("File Not Written", "Colaberator File", ex);
+                throw argEx;
+            }
+
+        }
+
         public void writeColaberatorFile(string ownerID, string userID, string filename)
         {
             try
@@ -251,7 +294,6 @@ namespace TestWebAp.Models.DocsViewModel
                         colaberators.Add(Line);
                         Line = reader.ReadLine();
                     }
-
                 }
             }
             catch (Exception ex)
@@ -261,6 +303,41 @@ namespace TestWebAp.Models.DocsViewModel
             }
 
             return colaberators;
+        }
+
+        public List<DocsClass> GetColabView(string email, string fileName)
+        {
+            List<DocsClass> emails = new List<DocsClass>();
+
+                using (MySqlConnection conn = GetConnection())
+                {
+                    List<string> collaberators = new List<string>();
+
+                    conn.Open();
+                    MySqlCommand cmd = new MySqlCommand("SELECT OwnerID, FileName FROM privatedocs Where FileName =" + "'" + fileName + "';", conn);
+
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            string filename = reader["FileName"].ToString();
+                            string ownerID = reader["OwnerID"].ToString();
+
+                            collaberators = readColaberatorFile(ownerID, filename);
+
+                            int c = collaberators.Count;
+                            for (int k = 0; k < collaberators.Count; k++)
+                            {
+                                    emails.Add(new DocsClass()
+                                    {
+                                        Email = GetEmail(reader["OwnerID"].ToString())
+                                    });
+                            }
+                        }
+                    }
+
+                    return emails;
+                }
         }
 
         public List<DocsClass> GetSharedFiles(string email)
@@ -319,8 +396,13 @@ namespace TestWebAp.Models.DocsViewModel
             {
                 using (MySqlConnection Conn = GetConnection())
                 {
-                    MySqlCommand cmd = new MySqlCommand("DELETE FROM privatedocs WHERE OwnerID = '" + OwnerID + "' AND FileName = '" + filename + "';", Conn);
                     Conn.Open();
+
+                    MySqlCommand cmd = new MySqlCommand("DELETE FROM privatedocs WHERE OwnerID = @OwnerID AND FileName = @filename;", Conn);
+
+                    cmd.Parameters.AddWithValue("@OwnerID", OwnerID);
+                    cmd.Parameters.AddWithValue("@filename", filename);
+
                     if (cmd.ExecuteNonQuery() == 1 && LogFile(OwnerID, OwnerID, filename, "Deleted"))
                         deleted = true;
                 }
@@ -342,8 +424,13 @@ namespace TestWebAp.Models.DocsViewModel
             {
                 using (MySqlConnection Conn = GetConnection())
                 {
-                    MySqlCommand cmd = new MySqlCommand("DELETE FROM publicdocs WHERE OwnerID = '" + OwnerID + "' AND FileName = '" + filename + "';", Conn);
                     Conn.Open();
+
+                    MySqlCommand cmd = new MySqlCommand("DELETE FROM publicdocs WHERE OwnerID = @OwnerID AND FileName = @filename;", Conn);
+
+                    cmd.Parameters.AddWithValue("@OwnerID", OwnerID);
+                    cmd.Parameters.AddWithValue("@filename", filename);
+
                     if (cmd.ExecuteNonQuery() == 1 && LogFile(OwnerID, OwnerID, filename, "Deleted"))
                         deleted = true;
                 }
@@ -363,12 +450,20 @@ namespace TestWebAp.Models.DocsViewModel
 
             try
             {
-                string sizeMB = (fileSize / 1024).ToString("0.0") + " KB";
+                string sizeKB = (fileSize / 1024).ToString("0.0") + " KB";
                 string OF = OwnerID + "  " + oldfilename;
+
                 using (MySqlConnection Conn = GetConnection())
                 {
-                    MySqlCommand cmd = new MySqlCommand("UPDATE publicdocs SET FileName = '" + NewFileName + "', DateUploaded = '" + DateTime.Now + "', FileSize = '" + sizeMB + "' WHERE OwnerID = '" + OwnerID + "' AND FileName = '" + oldfilename + "';", Conn);
                     Conn.Open();
+
+                    MySqlCommand cmd = new MySqlCommand("UPDATE publicdocs SET FileName = @NewFileName, DateUploaded = @CurrentDate, FileSize = @sizeKB WHERE OwnerID = @OwnerID AND FileName = @oldfilename;", Conn);
+
+                    cmd.Parameters.AddWithValue("@NewFileName", NewFileName);
+                    cmd.Parameters.AddWithValue("@CurrentDate", DateTime.Now);
+                    cmd.Parameters.AddWithValue("@sizeKB", sizeKB);
+                    cmd.Parameters.AddWithValue("@OwnerID", OwnerID);
+                    cmd.Parameters.AddWithValue("@oldfilename", oldfilename);
 
                     if (cmd.ExecuteNonQuery() == 1 && LogFile(OwnerID, currentUser, NewFileName, "Updated"))
                         updated = true;
@@ -389,12 +484,19 @@ namespace TestWebAp.Models.DocsViewModel
 
             try
             {
-                string sizeMB = (fileSize / 1024).ToString("0.0") + " KB";
+                string sizeKB = (fileSize / 1024).ToString("0.0") + " KB";
 
                 using (MySqlConnection Conn = GetConnection())
                 {
-                    MySqlCommand cmd = new MySqlCommand("UPDATE privatedocs SET FileName = '" + NewFileName + "', DateUploaded = '" + DateTime.Now + "', FileSize = '" + sizeMB + "' WHERE OwnerID = '" + OwnerID + "' AND FileName = '" + oldfilename + "';", Conn);
                     Conn.Open();
+
+                    MySqlCommand cmd = new MySqlCommand("UPDATE privatedocs SET FileName = @NewFileName, DateUploaded = @CurrentDate, FileSize = @sizeKB WHERE OwnerID = @OwnerID AND FileName = @oldfilename;", Conn);
+
+                    cmd.Parameters.AddWithValue("@NewFileName", NewFileName);
+                    cmd.Parameters.AddWithValue("@CurrentDate", DateTime.Now);
+                    cmd.Parameters.AddWithValue("@sizeKB", sizeKB);
+                    cmd.Parameters.AddWithValue("@OwnerID", OwnerID);
+                    cmd.Parameters.AddWithValue("@oldfilename", oldfilename);
 
                     if (cmd.ExecuteNonQuery() == 1 && LogFile(OwnerID, currentUser, NewFileName, "Updated"))
                         updated = true;
@@ -419,7 +521,13 @@ namespace TestWebAp.Models.DocsViewModel
                 {
                     conn.Open();
 
-                    MySqlCommand cmd = new MySqlCommand("INSERT INTO logtable (ownerEmail, updatedBy, filename, action, dateOfAction) VALUES (" + "'" + GetEmail(ownerID) + "','" + GetEmail(updatedBy) + "','" + filename + "','" + action + "','" + DateTime.Now + "');", conn);
+                    MySqlCommand cmd = new MySqlCommand("INSERT INTO logtable (ownerEmail, updatedBy, filename, action, dateOfAction) VALUES (@OwnerEmail, @Email, @filename, @action, @CurrentDate);", conn);
+
+                    cmd.Parameters.AddWithValue("@OwnerEmail", GetEmail(ownerID));
+                    cmd.Parameters.AddWithValue("@Email", GetEmail(updatedBy));
+                    cmd.Parameters.AddWithValue("@filename", filename);
+                    cmd.Parameters.AddWithValue("@action", action);
+                    cmd.Parameters.AddWithValue("@CurrentDate", DateTime.Now);
 
                     if (cmd.ExecuteNonQuery() == 1)
                         logWritten = true;
