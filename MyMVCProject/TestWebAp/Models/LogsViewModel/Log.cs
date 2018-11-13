@@ -23,7 +23,7 @@ namespace TestWebAp.Models.LogsViewModel
 
 
         public Log()
-        {}
+        { }
 
         public Log(string Connection)
         {

@@ -81,7 +81,7 @@ namespace TestWebAp.Controllers
             if (file == null || file.Length == 0)
                 return View("UploadFailed");
 
-            string path = @"C:\\Users\\brand\\Desktop\\Userfiles\\" + dbContext.GetEmail(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString()) + @"\\" + file.FileName;
+            string path = @"C:\\Users\\brand\\Desktop\\Userfiles\\" + dbContext.GetEmail(OwnerID) + @"\\" + file.FileName;
 
             if (dbContext.updatePublicFile(OwnerID.ToString(), this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString(), OldFileName, file.FileName, (double)file.Length))
             {
@@ -139,7 +139,30 @@ namespace TestWebAp.Controllers
                 return File(memory, GetContentType(path), Path.GetFileName(path));
             }
 
-            return View("SharedView");
+            return View("DocsView");
+        }
+
+        public async Task<IActionResult> DownloadPublic(string filename, string email)
+        {
+            dbContext = HttpContext.RequestServices.GetService(typeof(TestWebAp.Models.DocsViewModel.DocsContextClass)) as Models.DocsViewModel.DocsContextClass;
+
+            if (filename == null)
+                return Content("filename not present");
+
+            string path = "C:\\Users\\brand\\Desktop\\Userfiles\\" + email + "\\" + filename;
+
+            if (path != null)
+            {
+                MemoryStream memory = new MemoryStream();
+                using (FileStream stream = new FileStream(path, FileMode.Open))
+                {
+                    await stream.CopyToAsync(memory);
+                }
+                memory.Position = 0;
+                return File(memory, GetContentType(path), Path.GetFileName(path));
+            }
+
+            return View("DocsView");
         }
 
         public async Task<IActionResult> Downloadshared(string filename)
@@ -208,6 +231,13 @@ namespace TestWebAp.Controllers
             return View(context.GetAllPrivateFiles(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString()));
         }
 
+        public IActionResult SharedView()
+        {
+            Models.DocsViewModel.DocsContextClass context = HttpContext.RequestServices.GetService(typeof(TestWebAp.Models.DocsViewModel.DocsContextClass)) as Models.DocsViewModel.DocsContextClass;
+
+            return View(context.GetSharedFiles(context.GetEmail(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString())));
+        }
+
         public IActionResult UploadPublicView()
         {
             return View();
@@ -225,6 +255,15 @@ namespace TestWebAp.Controllers
             ViewBag.Filename = filename;
 
             return View("AddCollaberatorView", context.GetAllUsers());
+        }
+
+        public IActionResult WriteColaberatorFile(string email, string filename)
+        {
+            Models.DocsViewModel.DocsContextClass context = HttpContext.RequestServices.GetService(typeof(TestWebAp.Models.DocsViewModel.DocsContextClass)) as Models.DocsViewModel.DocsContextClass;
+
+            context.writeColaberatorFile(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString(), email, filename);
+
+            return View("PrivateDocsView", context.GetAllPrivateFiles(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString()));
         }
 
         public IActionResult DeleteColabView(string filename)
@@ -245,22 +284,6 @@ namespace TestWebAp.Controllers
             context.ReWriteColabFile(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString(), filename, email);
 
             return View("PrivateDocsView", context.GetAllPrivateFiles(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString()));
-        }
-
-        public IActionResult WriteColaberatorFile(string email, string filename)
-        {
-            Models.DocsViewModel.DocsContextClass context = HttpContext.RequestServices.GetService(typeof(TestWebAp.Models.DocsViewModel.DocsContextClass)) as Models.DocsViewModel.DocsContextClass;
-
-            context.writeColaberatorFile(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString(), email, filename);
-
-            return View("PrivateDocsView", context.GetAllPrivateFiles(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString()));
-        }
-
-        public IActionResult SharedView()
-        {
-            Models.DocsViewModel.DocsContextClass context = HttpContext.RequestServices.GetService(typeof(TestWebAp.Models.DocsViewModel.DocsContextClass)) as Models.DocsViewModel.DocsContextClass;
-
-            return View(context.GetSharedFiles(context.GetEmail(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString())));
         }
 
         public IActionResult DeletePrivateFile(string OwnerID, string filename, string path)

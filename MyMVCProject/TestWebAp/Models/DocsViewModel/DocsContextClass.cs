@@ -240,17 +240,16 @@ namespace TestWebAp.Models.DocsViewModel
 
             try
             {
+                StreamWriter sw = new StreamWriter("C:\\Users\\brand\\Desktop\\Userfiles\\" + GetEmail(ownerID) + "\\" + filename.Remove(filename.LastIndexOf("."), 1) + "Collaberators1.txt");
+
                 foreach (string email in Colabs)
                 {
                     if (email != userEmail)
-                    {
-                        StreamWriter sw = new StreamWriter("C:\\Users\\brand\\Desktop\\Userfiles\\" + GetEmail(ownerID) + "\\" + filename.Remove(filename.LastIndexOf("."), 1) + "Collaberators1.txt", true);
-
+                    {                       
                         sw.WriteLine(email);
-
-                        sw.Close();
                     }
                 }
+                sw.Close();
 
                 File.Delete("C:\\Users\\brand\\Desktop\\Userfiles\\" + GetEmail(ownerID) + "\\" + filename.Remove(filename.LastIndexOf("."), 1) + "Collaberators.txt");
                 File.Move("C:\\Users\\brand\\Desktop\\Userfiles\\" + GetEmail(ownerID) + "\\" + filename.Remove(filename.LastIndexOf("."), 1) + "Collaberators1.txt", "C:\\Users\\brand\\Desktop\\Userfiles\\" + GetEmail(ownerID) + "\\" + filename.Remove(filename.LastIndexOf("."), 1) + "Collaberators.txt");
@@ -263,13 +262,13 @@ namespace TestWebAp.Models.DocsViewModel
 
         }
 
-        public void writeColaberatorFile(string ownerID, string userID, string filename)
+        public void writeColaberatorFile(string ownerID, string email, string filename)
         {
             try
             {
                 StreamWriter sw = new StreamWriter("C:\\Users\\brand\\Desktop\\Userfiles\\" + GetEmail(ownerID) + "\\" + filename.Remove(filename.LastIndexOf("."),1) + "Collaberators.txt", true);
 
-                sw.WriteLine(userID);
+                sw.WriteLine(email);
 
                 sw.Close();
             }
@@ -314,9 +313,11 @@ namespace TestWebAp.Models.DocsViewModel
                     List<string> collaberators = new List<string>();
 
                     conn.Open();
-                    MySqlCommand cmd = new MySqlCommand("SELECT OwnerID, FileName FROM privatedocs Where FileName =" + "'" + fileName + "';", conn);
+                    MySqlCommand cmd = new MySqlCommand("SELECT OwnerID, FileName FROM privatedocs Where FileName = @filename;", conn);
 
-                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    cmd.Parameters.AddWithValue("@filename", fileName);
+
+                using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
                         {
@@ -324,13 +325,12 @@ namespace TestWebAp.Models.DocsViewModel
                             string ownerID = reader["OwnerID"].ToString();
 
                             collaberators = readColaberatorFile(ownerID, filename);
-
-                            int c = collaberators.Count;
+                        
                             for (int k = 0; k < collaberators.Count; k++)
                             {
                                     emails.Add(new DocsClass()
                                     {
-                                        Email = GetEmail(reader["OwnerID"].ToString())
+                                        Email = collaberators[k],
                                     });
                             }
                         }
@@ -444,7 +444,7 @@ namespace TestWebAp.Models.DocsViewModel
             return deleted;
         }
 
-        public bool updatePublicFile(string currentUser, string OwnerID, string oldfilename, string NewFileName, double fileSize)
+        public bool updatePublicFile(string OwnerID, string currentUser, string oldfilename, string NewFileName, double fileSize)
         {
             bool updated = false;
 
@@ -527,7 +527,7 @@ namespace TestWebAp.Models.DocsViewModel
                     cmd.Parameters.AddWithValue("@Email", GetEmail(updatedBy));
                     cmd.Parameters.AddWithValue("@filename", filename);
                     cmd.Parameters.AddWithValue("@action", action);
-                    cmd.Parameters.AddWithValue("@CurrentDate", DateTime.Now);
+                    cmd.Parameters.AddWithValue("@CurrentDate", DateTime.Now.ToShortDateString());
 
                     if (cmd.ExecuteNonQuery() == 1)
                         logWritten = true;

@@ -8,8 +8,6 @@ using System.Threading.Tasks;
 
 namespace TestWebAp.Services
 {
-    // This class is used by the application to send email for account confirmation and password reset.
-    // For more details see https://go.microsoft.com/fwlink/?LinkID=532713
     public class EmailSender : IEmailSender
     {
         public EmailSender(IOptions<AuthMessageSenderOptions> optionsAccessor)
@@ -17,7 +15,7 @@ namespace TestWebAp.Services
             Options = optionsAccessor.Value;
         }
 
-        public AuthMessageSenderOptions Options { get; } //set only via Secret Manager
+        public AuthMessageSenderOptions Options { get; }
 
         public Task SendEmailAsync(string email, string subject, string message)
         {
@@ -36,8 +34,6 @@ namespace TestWebAp.Services
             };
             msg.AddTo(new EmailAddress(email));
 
-            // Disable click tracking.
-            // See https://sendgrid.com/docs/User_Guide/Settings/tracking.html
             msg.TrackingSettings = new TrackingSettings
             {
                 ClickTracking = new ClickTracking { Enable = false }
