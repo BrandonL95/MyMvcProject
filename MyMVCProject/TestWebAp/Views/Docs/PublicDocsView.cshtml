@@ -14,6 +14,7 @@
                     <div class="card mb-4">
                         <h5 class="card-title">@item.Myfilenames</h5>
                         <p>@item.Email</p>
+                        <p>@item.FileSize</p>
                         <a asp-area="" asp-controller="Docs" asp-action="DownloadPublic" asp-route-filename=@item.Myfilenames asp-route-email=@item.Email>Download</a>
                         <a asp-area="" asp-controller="Docs" asp-action="UpdatePublicFile" asp-route-OwnerID=@item.OwnerID asp-route-OldFileName=@item.Myfilenames>Update</a>
                         @if (ViewBag.UserID == item.OwnerID.ToString())

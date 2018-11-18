@@ -13,6 +13,7 @@
                 <div class="col-md-4">
                     <div class="card mb-4">
                         <h5 class="card-title">@item.Myfilenames</h5>
+                        <p>@item.FileSize</p>
                         <a asp-area="" asp-controller="Docs" asp-action="Download" asp-route-filename=@item.Myfilenames>Download</a>
                         <a asp-area="" asp-controller="Docs" asp-action="UpdatePrivateFile" asp-route-OwnerID=@item.OwnerID asp-route-OldFileName=@item.Myfilenames>Update</a>
                         <a asp-area="" asp-controller="Log" asp-action="DocLogView" asp-route-OwnerID=@item.OwnerID asp-route-filename=@item.Myfilenames>History Log</a>

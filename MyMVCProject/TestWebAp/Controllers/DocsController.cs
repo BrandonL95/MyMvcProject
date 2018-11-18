@@ -9,12 +9,23 @@ using TestWebAp.Models.DocsViewModel;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using TestWebAp.Models.AccountViewModels;
+using TestWebAp.Services;
 
 namespace TestWebAp.Controllers
 {
     public class DocsController : Controller
     {
+        private readonly IEmailSender _emailSender;
+
         DocsContextClass dbContext;
+
+        //public DocsController()
+       // {}
+
+        public DocsController(IEmailSender emailSender)
+        {        
+            _emailSender = emailSender;
+        }
 
         public IActionResult Index()
         {
@@ -257,11 +268,13 @@ namespace TestWebAp.Controllers
             return View("AddCollaberatorView", context.GetAllUsers());
         }
 
-        public IActionResult WriteColaberatorFile(string email, string filename)
+        public async Task<IActionResult> WriteColaberatorFile(string email, string filename)
         {
             Models.DocsViewModel.DocsContextClass context = HttpContext.RequestServices.GetService(typeof(TestWebAp.Models.DocsViewModel.DocsContextClass)) as Models.DocsViewModel.DocsContextClass;
 
             context.writeColaberatorFile(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString(), email, filename);
+            string message = context.GetEmail(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString()) + " has added you as a collaberator for " + filename;
+            await _emailSender.SendEmailAsync(email, "Collaberation", message);
 
             return View("PrivateDocsView", context.GetAllPrivateFiles(this.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString()));
         }

@@ -14,5 +14,7 @@ namespace TestWebAp.Models.DocsViewModel
         public string Email { get; set; }
 
         public string OwnerID { get; set; }
+
+        public string FileSize { get; set; }
     }
 }

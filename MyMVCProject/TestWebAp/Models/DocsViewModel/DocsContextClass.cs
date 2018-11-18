@@ -97,7 +97,7 @@ namespace TestWebAp.Models.DocsViewModel
                 using (MySqlConnection conn = GetConnection())
                 {
                     conn.Open();
-                    MySqlCommand cmd = new MySqlCommand("SELECT OwnerID, FileName, FilePath FROM publicdocs", conn);
+                    MySqlCommand cmd = new MySqlCommand("SELECT OwnerID, FileName, FilePath, FileSize FROM publicdocs", conn);
 
                     using (var reader = cmd.ExecuteReader())
                     {
@@ -108,7 +108,8 @@ namespace TestWebAp.Models.DocsViewModel
                                 Myfilenames = reader["FileName"].ToString(),
                                 Email = GetEmail(reader["OwnerID"].ToString()),
                                 OwnerID = reader["OwnerID"].ToString(),
-                                docPath = reader["FilePath"].ToString()
+                                docPath = reader["FilePath"].ToString(),
+                                FileSize = reader["FileSize"].ToString()
                             });
                         }
                     }
@@ -132,7 +133,7 @@ namespace TestWebAp.Models.DocsViewModel
                 using (MySqlConnection conn = GetConnection())
                 {
                     conn.Open();
-                    MySqlCommand cmd = new MySqlCommand("SELECT OwnerID, FileName, FilePath FROM privatedocs Where OwnerID = @userID;", conn);
+                    MySqlCommand cmd = new MySqlCommand("SELECT OwnerID, FileName, FilePath, FileSize FROM privatedocs Where OwnerID = @userID;", conn);
 
                     cmd.Parameters.AddWithValue("@userID", userID);
 
@@ -144,7 +145,8 @@ namespace TestWebAp.Models.DocsViewModel
                             {
                                 Myfilenames = reader["FileName"].ToString(),
                                 OwnerID = reader["OwnerID"].ToString(),
-                                docPath = reader["FilePath"].ToString()
+                                docPath = reader["FilePath"].ToString(),
+                                FileSize = reader["FileSize"].ToString()
 
                             });
                         }
@@ -351,7 +353,7 @@ namespace TestWebAp.Models.DocsViewModel
                     List<string> collaberators = new List<string>();
 
                     conn.Open();
-                    MySqlCommand cmd = new MySqlCommand("SELECT OwnerID, FileName FROM privatedocs", conn);
+                    MySqlCommand cmd = new MySqlCommand("SELECT OwnerID, FileName, FileSize FROM privatedocs", conn);
 
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
@@ -370,7 +372,8 @@ namespace TestWebAp.Models.DocsViewModel
                                     {
                                         OwnerID = reader["OwnerID"].ToString(),
                                         Myfilenames = reader["FileName"].ToString(),
-                                        Email = GetEmail(reader["OwnerID"].ToString())
+                                        Email = GetEmail(reader["OwnerID"].ToString()),
+                                        FileSize = reader["FileSize"].ToString()
                                     });
                                 }
                             }
